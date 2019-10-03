@@ -68,7 +68,7 @@ FAO_Rn <- function(loc, weather, albedo = 0.23, Gsc = 0.0820, SBc = 4.903e-9){
     Ra <- FAO_Ra(weather$dt, weather$datetimes, loc$phi, loc$Lm, loc$Lz, Gsc)
   }
   Rso  <- FAO_Rso(Ra, loc$z)
-  ea   <- FAO_mean_ea(weather$dt, weather$atmp, weather$RH)
+  ea   <- FAO_mean_ea(weather$atmp, weather$RH)
   Rnl  <- FAO_Rnl(weather$dt, weather$Rs, Rso, ea, weather$atmp, SBc)
 
   # Net shortwave radiation

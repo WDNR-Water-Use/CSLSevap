@@ -4,12 +4,9 @@
 \alias{FAO_mean_es}
 \title{FAO Mean Saturation Vapour Pressure - Daily Timestep or Larger}
 \usage{
-FAO_mean_es(dt, atmp)
+FAO_mean_es(atmp)
 }
 \arguments{
-\item{dt}{a string indicating the timestep of calculation. If not "hourly",
-assumes a daily or larger timestep}
-
 \item{atmp}{air temperature (degrees C). When dt is "daily" or larger,
 argument should be a list with elements "min" and "max" for daily
 min and max temperatures. When dt is "hourly", argument should be

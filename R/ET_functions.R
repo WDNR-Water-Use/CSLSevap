@@ -66,9 +66,9 @@ FAO_ET <- function(loc, weather, albedo = 0.23, Gsc = 0.0820, SBc = 4.903e-9){
   tmp_K <- NISTdegCtOk(tmp_C)
 
   # Vapour parameters
-  Delta <- FAO_slope_es_curve(weather$dt, weather$atmp)
+  Delta <- FAO_slope_es_curve(weather$atmp)
   gamma <- FAO_psychrometric_constant(loc$z)
-  vpd   <- FAO_vpd(weather$dt, weather$atmp, weather$RH)
+  vpd   <- FAO_vpd(weather$atmp, weather$RH)
 
   # Wind at 2m
   if (weather$wind_elev != 2){

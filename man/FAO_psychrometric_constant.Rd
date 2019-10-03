@@ -5,7 +5,7 @@
 \title{FAO Psychrometric Constant}
 \usage{
 FAO_psychrometric_constant(z, atmp = NULL, lambda = 2.45,
-  cp = 0.0011013, epsilon = 0.622)
+  cp = 0.001013, epsilon = 0.622)
 }
 \arguments{
 \item{z}{elevation above sea level (m)}
