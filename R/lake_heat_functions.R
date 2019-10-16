@@ -137,12 +137,20 @@ McJannet_Gw <- function(loc, lake, weather, rho_w = 997.9, cw = 0.00419) {
 #'
 #' @export
 McJannet_wtmp <- function(loc, lake, weather) {
+  lst   <- lake$lst
   eqtmp <- McJannet_eqtmp(loc, lake, weather)
   Ctime <- McJannet_time_const(loc, lake, weather)
   wtmp0 <- weather$wtmp0
   wtmp  <- NULL
   for (i in 1:length(weather$datetimes)) {
-    wtmp[i] <- eqtmp[i] + (wtmp0 - eqtmp[i])*exp(-1/Ctime[i])
+    today <- weather$datetimes[i]
+    if (today %in% floor_date(lst$date, unit = "day")) {
+      # Use input temp if have it
+      wtmp[i] <- mean(lst$ltmp[which(floor_date(lst$date, unit = "day") == today)])
+    } else {
+      # Estimate from previous day temp if no input temp
+      wtmp[i] <- eqtmp[i] + (wtmp0 - eqtmp[i])*exp(-1/Ctime[i])
+    }
     wtmp0   <- wtmp[i]
   }
   return(wtmp)

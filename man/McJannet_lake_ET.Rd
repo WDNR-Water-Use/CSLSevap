@@ -26,6 +26,7 @@ McJannet_lake_ET(loc, lake, weather, albedo, Gsc = 0.082,
 \itemize{
 \item A - surface area of the lake (km^2).
 \item depth_m - depth of the lake (m).
+\item lst - data frame with date (datetime) and ltmp (lake temperature, degC)
 }}
 
 \item{weather}{a list with weather data that includes:

@@ -27,6 +27,7 @@
 #' \itemize{
 #' \item A - surface area of the lake (km^2).
 #' \item depth_m - depth of the lake (m).
+#' \item lst - data frame with date (datetime) and ltmp (lake temperature, degC)
 #' }
 #' @param weather a list with weather data that includes:
 #' \itemize{
