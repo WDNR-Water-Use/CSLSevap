@@ -1,6 +1,9 @@
 #wind_functions.R
 # Includes:
 # - FAO_u2
+# - uz_to_u10
+# - wind_fcn
+# - aero_resist
 
 # ------------------------------------------------------------------------------
 #' FAO Wind Speed at 2m Height
@@ -47,7 +50,7 @@ FAO_u2 <- function(uz, z = 10) {
 #'
 #' @export
 
-McMahon_u10 <- function(uz, z = 2, z0 = 0.02) {
+uz_to_u10 <- function(uz, z = 2, z0 = 0.02) {
   u10 <- uz*log(10/z0)/log(z/z0)
   return(u10)
 }
@@ -72,7 +75,7 @@ McMahon_u10 <- function(uz, z = 2, z0 = 0.02) {
 #'
 #' @export
 
-McJannet_u_fcn <- function(u10, A) {
+wind_fcn <- function(u10, A) {
   u_fcn <- ((5/A)^0.05)*(3.80 + 1.57*u10)
   return(u_fcn)
 }
@@ -102,10 +105,9 @@ McJannet_u_fcn <- function(u10, A) {
 #'
 #' @export
 
-McJannet_aero_resist <- function(uz, wind_z, z0, A, lake_z, rho_a = 1.20,
-                                 ca = 0.001013) {
-  u10   <- McMahon_u10(uz, wind_z, z0)
-  u_fcn <- McJannet_u_fcn(u10, A)
+aero_resist <- function(uz, wind_z, z0, A, lake_z, rho_a = 1.20, ca = 0.001013){
+  u10   <- uz_to_u10(uz, wind_z, z0)
+  u_fcn <- wind_fcn(u10, A)
   gamma <- FAO_psychrometric_constant(lake_z)
   ra    <- rho_a*ca/(gamma*u_fcn/(60*60*24))
   return(ra)

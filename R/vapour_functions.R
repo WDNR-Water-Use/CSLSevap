@@ -6,6 +6,9 @@
 # - FAO_vpd
 # - FAO_slope_es_curve
 # - FAO_psychrometric_constant
+# - latent_heat_vapor
+# - dew_tmp
+# - wet_bulb_tmp
 #
 # ------------------------------------------------------------------------------
 #' FAO Saturation Vapour Pressure
@@ -236,7 +239,7 @@ latent_heat_vapor <- function(atmp) {
 #'
 #' @export
 
-McJannet_dewtmp <- function(atmp, RH) {
+dew_tmp <- function(atmp, RH) {
   ea     <- FAO_mean_ea(atmp, RH)
   dewtmp <- (116.9 + 237.3*log(ea))/(16.78 - log(ea))
   return(dewtmp)
@@ -268,9 +271,9 @@ McJannet_dewtmp <- function(atmp, RH) {
 #'
 #' @export
 
-McJannet_wbtmp <- function(atmp, RH) {
+wet_bulb_tmp <- function(atmp, RH) {
   ea     <- FAO_mean_ea(atmp, RH)
-  dewtmp <- McJannet_dewtmp(atmp, RH)
+  dewtmp <- dew_tmp(atmp, RH)
 
   if (class(atmp) == "list"){ atmp <- (atmp$max + atmp$min)/2 }
 
