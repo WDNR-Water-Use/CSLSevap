@@ -1,4 +1,4 @@
 library(testthat)
-library(faoET)
+library(H2Oevap)
 
-test_check("faoET")
+test_check("H2Oevap")
