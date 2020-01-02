@@ -1,20 +1,29 @@
 #heat_functions.R
 # Includes:
-# - FAO_G
-# - lake_Gw
-# - lake_wtmp
-# - lake_eqtmp
-# - lake_time_const
+# - heat_flux
+# - tmp_water
+# - tmp_equil
+# - time_const
 
 # ------------------------------------------------------------------------------
-#' Soil Heat Flux - Hourly
+#' Heat Flux
 #'
 #' Calculates soil heat flux for hourly, daily, or monthly calculations beneath a
 #' dense cover of grass. Based on Equations 42-46 in Allen et al. (1998).
 #'
+#' Calculates the change in heat storage based on water temperature following
+#' McJannet et al. (2008) Equation 31 as presented in McMahon et al. S11.33
+#' (2013).
+#'
 #' @references Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
 #'   evapotranspiration: Guidelines for computing crop water requirements. Rome:
 #'   FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
+#'
+#' @references McMahon, T. A., Peel, M. C., Lowe, L., Srikanthan, R., and
+#'   McVicar, T. R.: Estimating actual, potential, reference crop and pan
+#'   evaporation using standard meteorological data: a pragmatic synthesis,
+#'   Hydrol. Earth Syst. Sci., 17, 1331–1363,
+#'   https://doi.org/10.5194/hess-17-1331-2013, 2013.
 #'
 #' @param dt string indicating the timestep of input weather series. Expects
 #'            "hourly", "daily", or "monthly".
@@ -35,88 +44,72 @@
 #'            max air temperature (degrees C) corresponding with datetimes
 #'            vector
 #'
-#' @import lubridate
-#' @importFrom utils tail
 #'
-#' @return \item{G}{soil heat flux (MJ/m^2/hr)}
-#'
-#' @export
-FAO_G <- function(dt, datetimes, phi, Lm, Lz, Rn, atmp) {
-  if (dt == "hourly"){
-    for (i in 1:length(datetimes)-1){
-      tL   <- int_length(datetimes[i] %--% datetimes[i+1])
-      tmid <- datetimes[i] + seconds(tL/2)
-      J    <- yday(tmid)
-
-      delta        <- FAO_declination(J)
-      omega_sunset <- FAO_hour_angle_sunset(phi, delta)
-      omega        <- FAO_hour_angle(tmid, tL, Lm, Lz)
-      omega_mid    <- (omega$omega1 + omega$omega2)/2
-      if (omega_mid > omega_sunset | omega_mid < -omega_sunset) {
-        night[i]   <- 1
-      } else {
-        night[i]   <- 0
-      }
-    }
-    night <- c(night, tail(night,1))
-    day   <- 1 - night
-    G     <- day*0.1*Rn + night*0.5*Rn
-  } else if (dt == "daily") {
-    G <- 0*Rn
-  } else if (dt == "monthly") {
-    tmp_C  <- (atmp$min + atmp$max)/2
-        G    <- NULL
-        G[1] <- NA
-    if (length(tmp_C) == 1) {
-    } else if (length(tmp_C) == 2) {
-        G[2] <- 0.14*(tmp_C[2] - tmp_C[1])
-    } else {
-      for (i in 2:(length(tmp_C)-1)){
-        G[i] <- 0.07*(tmp_C[i+1] - tmp_C[i-1])
-      }
-        G[i+1] <- 0.14*(tmp_C[i+1] - tmp_C[i])
-    }
-  }
-  return(G)
-}
-
-# ------------------------------------------------------------------------------
-#' Change in Heat Storage
-#'
-#' Calculates the change in heat storage based on water temperature following
-#' McJannet et al. (2008) Equation 31 as presented in McMahon et al. S11.33
-#' (2013).
-#'
-#' @references McMahon, T. A., Peel, M. C., Lowe, L., Srikanthan, R., and
-#'   McVicar, T. R.: Estimating actual, potential, reference crop and pan
-#'   evaporation using standard meteorological data: a pragmatic synthesis,
-#'   Hydrol. Earth Syst. Sci., 17, 1331–1363,
-#'   https://doi.org/10.5194/hess-17-1331-2013, 2013.
-#'
-#'
-#' @inheritParams lake_evap
+#' @inheritParams evap
 #' @param rho_w density of water (kg/m^3), defaults to 997.9 kg/m^3 at 20 deg C
 #' @param cw specific heat of water (MJ/kg/K), defaults to 0.00419
 #'
-#' @return
-#' \describe{
-#' \item{Gw}{change in heat storage (MJ/m^2/day)}
-#' }
+#'
+#' @import lubridate
+#' @importFrom utils tail
+#'
+#' @return \item{G}{heat flux (MJ/m^2/hr)}
 #'
 #' @export
-lake_Gw <- function(loc, lake, weather, rho_w = 997.9, cw = 0.00419) {
-  wtmp0   <- weather$wtmp0
-  wtmp    <- lake_wtmp(loc, lake, weather)
-  Gw      <- NULL
-  if (length(lake$depth_m) == 1) {
-    lake$depth_m <- rep(lake$depth_m, length(wtmp))
-  }
-  for (i in 1:length(wtmp)){
-    Gw[i]    <- rho_w*cw*lake$depth_m[i]*(wtmp[i] - wtmp0)
-    wtmp0    <- wtmp[i]
+heat_flux <- function(method, dt, datetimes, phi, Lm, Lz, Rn, atmp) {
+  (loc, lake, weather, rho_w = 997.9, cw = 0.00419)
+  if (method == "FAO") {
+    # FAO SOIL HEAT FLUX -------------------------------------------------------
+    if (dt == "hourly"){
+      for (i in 1:length(datetimes)-1){
+        tL   <- int_length(datetimes[i] %--% datetimes[i+1])
+        tmid <- datetimes[i] + seconds(tL/2)
+        J    <- yday(tmid)
+
+        delta        <- FAO_declination(J)
+        omega_sunset <- FAO_hour_angle_sunset(phi, delta)
+        omega        <- FAO_hour_angle(tmid, tL, Lm, Lz)
+        omega_mid    <- (omega$omega1 + omega$omega2)/2
+        if (omega_mid > omega_sunset | omega_mid < -omega_sunset) {
+          night[i]   <- 1
+        } else {
+          night[i]   <- 0
+        }
+      }
+      night <- c(night, tail(night,1))
+      day   <- 1 - night
+      G     <- day*0.1*Rn + night*0.5*Rn
+    } else if (dt == "daily") {
+      G <- 0*Rn
+    } else if (dt == "monthly") {
+      tmp_C  <- (atmp$min + atmp$max)/2
+      G    <- NULL
+      G[1] <- NA
+      if (length(tmp_C) == 1) {
+      } else if (length(tmp_C) == 2) {
+        G[2] <- 0.14*(tmp_C[2] - tmp_C[1])
+      } else {
+        for (i in 2:(length(tmp_C)-1)){
+          G[i] <- 0.07*(tmp_C[i+1] - tmp_C[i-1])
+        }
+        G[i+1] <- 0.14*(tmp_C[i+1] - tmp_C[i])
+      }
+    }
+  } else if (method == "McJannet"){ # end FAO soil heat flux
+    # MCJANNET LAKE HEAT FLUX ----------------------------------------------------
+    wtmp0   <- lake$wtmp0
+    wtmp    <- tmp_water(loc, lake, weather)
+    G       <- NULL
+    if (length(lake$depth_m) == 1) {
+      lake$depth_m <- rep(lake$depth_m, length(wtmp))
+    }
+    for (i in 1:length(wtmp)){
+      G[i]     <- rho_w*cw*lake$depth_m[i]*(wtmp[i] - wtmp0)
+      wtmp0    <- wtmp[i]
+    }
   }
 
-  return(Gw)
+  return(G)
 }
 
 # ------------------------------------------------------------------------------
@@ -138,11 +131,11 @@ lake_Gw <- function(loc, lake, weather, rho_w = 997.9, cw = 0.00419) {
 #' @return {wtmp}{water temperature (degrees C)}
 #'
 #' @export
-lake_wtmp <- function(loc, lake, weather) {
+tmp_water <- function(loc, lake, weather) {
   lst   <- lake$lst
-  eqtmp <- lake_eqtmp(loc, lake, weather)
+  eqtmp <- tmp_equil(loc, lake, weather)
   Ctime <- time_const(loc, lake, weather)
-  wtmp0 <- weather$wtmp0
+  wtmp0 <- lake$wtmp0
   wtmp  <- NULL
   for (i in 1:length(weather$datetimes)) {
     today <- weather$datetimes[i]
@@ -177,15 +170,15 @@ lake_wtmp <- function(loc, lake, weather) {
 #' @return {eqtmp}{equilibrium temperature (degrees C)}
 #'
 #' @export
-lake_eqtmp <- function(loc, lake, weather, SBc = 4.903e-9) {
+tmp_equil <- function(loc, lake, weather, SBc = 4.903e-9) {
   u10     <- uz_to_u10(weather$wind, weather$wind_elev, weather$z0)
-  u_fcn   <- wind_fcn(u10, lake$A)
-  gamma   <- FAO_psychrometric_constant(loc$z)
-  wbtmp   <- wet_bulb_tmp(weather$atmp, weather$RH)
-  Deltawb <- FAO_slope_es_curve(wbtmp)
+  ufcn    <- u_fcn(u10, lake$A)
+  gamma   <- psychrometric_constant(loc$z)
+  wbtmp   <- tmp_wet_bulb(weather$atmp, weather$RH)
+  Deltawb <- vp_sat_curve_slope(wbtmp)
   Rnwb    <- wet_bulb_Rn(loc, weather)
 
-  eqtmp   <- wbtmp + Rnwb/(4*SBc*(wbtmp + 273.15)^3 + u_fcn*(Deltawb + gamma))
+  eqtmp   <- wbtmp + Rnwb/(4*SBc*(wbtmp + 273.15)^3 + ufcn*(Deltawb + gamma))
 
   return(eqtmp)
 }
@@ -214,12 +207,12 @@ lake_eqtmp <- function(loc, lake, weather, SBc = 4.903e-9) {
 time_const <- function(loc, lake, weather, rho_w = 997.9, cw = 0.00419,
                        SBc = 4.903e-9) {
   u10     <- uz_to_u10(weather$wind, weather$wind_elev, weather$z0)
-  u_fcn   <- wind_fcn(u10, lake$A)
-  gamma   <- FAO_psychrometric_constant(loc$z)
-  wbtmp   <- wet_bulb_tmp(weather$atmp, weather$RH)
-  Deltawb <- FAO_slope_es_curve(wbtmp)
+  ufcn    <- u_fcn(u10, lake$A)
+  gamma   <- psychrometric_constant(loc$z)
+  wbtmp   <- tmp_wet_bulb(weather$atmp, weather$RH)
+  Deltawb <- vp_sat_curve_slope(wbtmp)
 
-  Ctime   <- rho_w*cw*lake$depth_m/(4*SBc*(wbtmp + 273.15)^3 + u_fcn*(Deltawb + gamma))
+  Ctime   <- rho_w*cw*lake$depth_m/(4*SBc*(wbtmp + 273.15)^3 + ufcn*(Deltawb + gamma))
 
   return(Ctime)
 }

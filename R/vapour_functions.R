@@ -4,7 +4,7 @@
 # - vp_sat_mean
 # - vp_act_mean
 # - vp_deficit
-# - vp_sat_slope
+# - vp_sat_curve_slope
 # - psychrometric_constant
 # - latent_heat_vapor
 # - tmp_dew
@@ -148,7 +148,7 @@ vp_deficit <- function(atmp, RH) {
 #'
 #' @export
 
-vp_sat_slope <- function(atmp) {
+vp_sat_curve_slope <- function(atmp) {
   if (class(atmp) == "list"){
     atmp <- (atmp$min + atmp$max)/2
   }

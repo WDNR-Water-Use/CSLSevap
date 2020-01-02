@@ -9,7 +9,7 @@
 #' evapotranspiration for a reference grass crop) based on Allen et al. (1998).
 #'
 #' "McJannet" calculates daily evaporation from a lake based on the method in
-#' McJannet et al. (2008) as presented in Equations S11.22 in McMahon et al.
+#' McJannet et al. (2008) as presented in Equation S11.22 in McMahon et al.
 #' (2013).
 #'
 #' @references Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
@@ -105,9 +105,9 @@ evaporation <- function(method = "FAO", loc = NULL, weather, lake = NULL,
     tmp_K <- NISTdegCtOk(tmp_C)
 
     # Vapour parameters
-    Delta <- FAO_slope_es_curve(weather$atmp)
-    gamma <- FAO_psychrometric_constant(loc$z)
-    vpd   <- FAO_vpd(weather$atmp, weather$RH)
+    Delta <- vp_sat_curve_slope(weather$atmp)
+    gamma <- psychrometric_constant(loc$z)
+    vpd   <- vpd(weather$atmp, weather$RH)
 
     # Wind at 2m
     if (weather$wind_elev != 2){
@@ -133,17 +133,17 @@ evaporation <- function(method = "FAO", loc = NULL, weather, lake = NULL,
     wtmp <- lake_wtmp(loc, lake, weather)
 
     # Vapour parameters
-    Delta_w <- FAO_slope_es_curve(wtmp)
-    es_w    <- FAO_mean_es(wtmp)
-    ea      <- FAO_mean_ea(weather$atmp, weather$RH)
+    Delta_w <- vp_sat_curve_slope(wtmp)
+    es_w    <- vp_sat_mean(wtmp)
+    ea      <- vp_act_mean(weather$atmp, weather$RH)
     lambda  <- latent_heat_vapor(weather$atmp)
-    gamma   <- FAO_psychrometric_constant(loc$z)
+    gamma   <- psychrometric_constant(loc$z)
 
     # Radiation
     Rn <- R_n(method, loc, lake, weather, albedo$water)
 
     # Water Heat Flux
-    Gw<- heat_flux(loc, lake, weather)
+    Gw <- heat_flux(method, loc, lake, weather)
 
     # Lake evaporation
     evap <- (Delta_w*(Rn - Gw) + 60*60*24*rho_a*ca*(es_w - ea)/ra)/
