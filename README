@@ -28,8 +28,7 @@ This package is organized based on [R package conventions](http://r-pkgs.had.co.
  * Code and data documentation (`man/`)
  * Tests (`tests/`)
 
-To access package documentation from within RStudio:
+From within RStudio:
 
+ * For a full list of available functions, use `help(package = CSLSevap)`
  * For help on a specific function, use `?function_name` as usual
- * For a full list of available functions, go to the `Packages` tab within the RStudio workspace and click on `CSLSevap`
-
