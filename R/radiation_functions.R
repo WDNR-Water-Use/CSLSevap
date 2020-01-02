@@ -1,6 +1,10 @@
 # radiation_functions.R
 # Includes:
+# - FAO_Rn
+# - FAO_Rnl
 # - FAO_Rns
+# - FAO_Rso
+# - FAO_Ra_night_adjusted
 # - FAO_Ra
 # - FAO_inverse_dist
 # - FAO_declination
@@ -13,6 +17,89 @@
 # - lake_Ril
 # - cloud_factor
 
+# - R_n (FAO, McJannet, wet_bulb)
+# - R_nl
+# - R_ns
+# - R_ol (McJannet, wet_bulb)
+# - R_il
+# - R_so
+# - R_a (normal, night-adjusted)
+# - inverse_dist
+# - declination
+# - hour_angle_sunset
+# - hour_angle
+# - cloud_factor
+
+# ------------------------------------------------------------------------------
+#' Net Solar or Shortwave Radiation
+#'
+#' Calculates the net solar or shortwave radiation using the "FAO" Penman
+#' Monteith approach for reference evapotranspiration (Allen et al., 1998,
+#' Equation 38), the "McJannet" approach for lake temperature (McMahon et al.,
+#' 2013, Equation S11.25), or the McJannet approach for "wet_bulb" temperature
+#' (McMahon et al., 2013, Equation S11.31).
+#'
+#' @references Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
+#'   evapotranspiration: Guidelines for computing crop water requirements. Rome:
+#'   FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
+#'
+#' @references McMahon, T. A., Peel, M. C., Lowe, L., Srikanthan, R., and
+#'   McVicar, T. R. (2013). Estimating actual, potential, reference crop and pan
+#'   evaporation using standard meteorological data: a pragmatic synthesis,
+#'   Hydrol. Earth Syst. Sci., 17, 1331–1363.
+#'   https://doi.org/10.5194/hess-17-1331-2013.
+#'
+#' @param type  type of net radiation function to use. Defaults to "FAO" for FAO
+#'              Penman-Monteith reference evapotranspiration. Other options
+#'              include "McJannet" for net radiation at lake temperature and
+#'              "wet_bulb" for net radiation at wet-bulb temperature.
+#' @param Gsc solar constant (MJ/m^2/min). Defaults to 0.0820 MJ/m^2/min.
+#' @param SBc Stefan-Boltzman constant (MJ/m^2/day). Defaults to 4.903e-9
+#'            MJ/m^2/day.
+#' @inheritParams evaporation
+#'
+#' @return \item{Rn}{net radiation (MJ/m^2/timestep)}
+#'
+#' @export
+R_n <- function(type = "FAO", loc, lake, weather, albedo){
+  # Shortwave
+  Rns  <- R_ns(weather$Rs, albedo)
+
+  # Longwave
+  if (type == "FAO") {
+    # FAO NET RADIATION --------------------------------------------------------
+    if (weather$dt == "hourly") {
+      Ra <- R_a_adj(weather$datetimes, loc$phi, loc$Lm, loc$Lz)
+    } else {
+      Ra <- R_a(weather$dt, weather$datetimes, loc$phi, loc$Lm, loc$Lz)
+    }
+    Rso  <- R_so(Ra, loc$z)
+    ea   <- vp_act_mean(weather$atmp, weather$RH)
+    Rnl  <- R_nl(weather$dt, weather$Rs, Rso, ea, weather$atmp)
+  } else {
+    # MCJANNET LAKE EVAPORATION ------------------------------------------------
+    Ra   <- R_a(weather$dt, weather$datetimes, loc$phi, loc$Lm, loc$Lz)
+    Rso  <- R_so(Ra, loc$z)
+    Cf   <- cloud_factor(weather$Rs, Rso)
+    Ril  <- R_il(Cf, weather$atmp)
+    if (type == "McJannet") {
+      # At Lake Temperature ----------------------------------------------------
+      wtmp <- tmp_water(loc, lake, weather)
+      Rol  <- R_ol(type, wtmp)
+    } else if (type == "wet_bulb") {
+      # At Wet-Bulb Temperature ------------------------------------------------
+      wbtmp <- tmp_wet_bulb(weather$atmp, weather$RH)
+      Rol   <- R_ol(type, wbtmp, weather$atmp)
+    }
+    Rnl  <- Rol - Ril
+  }
+
+  # Net
+  Rn   <- Rns - Rnl
+  return(Rn)
+}
+
+
 # ------------------------------------------------------------------------------
 #' Net Solar or Shortwave Radiation
 #'
@@ -24,28 +111,16 @@
 #'   evapotranspiration: Guidelines for computing crop water requirements. Rome:
 #'   FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
 #'
-#' @inheritParams FAO_evap
+#' @param Rs incoming solar radiation (MJ/m^2/timestep)
+#' @param albedo albedo or canopy reflection coefficient (-). Defaults to 0.23
+#'               for the hypothetical grass reference crop.
 #'
-#' @return \item{Rn}{net radiation (MJ/m^2/timestep)}
+#' @return \item{Rns}{Net solar or shortwave radiation (MJ/m^2/timestep)}
 #'
 #' @export
-FAO_Rn <- function(loc, weather, albedo = 0.23, Gsc = 0.0820, SBc = 4.903e-9){
-  # Net longwave radiation
-  if (weather$dt == "hourly") {
-    Ra <- FAO_Ra_night_adjusted(weather$datetimes, loc$phi, loc$Lm, loc$Lz, Gsc)
-  } else {
-    Ra <- FAO_Ra(weather$dt, weather$datetimes, loc$phi, loc$Lm, loc$Lz, Gsc)
-  }
-  Rso  <- FAO_Rso(Ra, loc$z)
-  ea   <- FAO_mean_ea(weather$atmp, weather$RH)
-  Rnl  <- FAO_Rnl(weather$dt, weather$Rs, Rso, ea, weather$atmp, SBc)
-
-  # Net shortwave radiation
-  Rns  <- FAO_Rns(weather$Rs, albedo)
-
-  # Net radiation
-  Rn   <- Rns - Rnl
-  return(Rn)
+R_ns <- function(Rs, albedo = 0.23){
+  Rns <- (1 - albedo)*Rs
+  return(Rns)
 }
 
 # ------------------------------------------------------------------------------
@@ -78,7 +153,7 @@ FAO_Rn <- function(loc, weather, albedo = 0.23, Gsc = 0.0820, SBc = 4.903e-9){
 #'                    MJ/m^2/day, depending on dt)}
 #'
 #' @export
-FAO_Rnl <- function(dt, Rs, Rso, ea, atmp, SBc = 4.903e-9){
+R_nl <- function(dt, Rs, Rso, ea, atmp, SBc = 4.903e-9){
   if (dt == "hourly") {
     SBc   <- SBc/24
     temp4 <- SBc*(NISTdegCtOk(atmp)^4)
@@ -90,29 +165,6 @@ FAO_Rnl <- function(dt, Rs, Rso, ea, atmp, SBc = 4.903e-9){
   Rnl     <- temp4*(0.34 - 0.14*sqrt(ea))*(1.35*ratio - 0.35)
 
   return(Rnl)
-}
-
-# ------------------------------------------------------------------------------
-#' Net Solar or Shortwave Radiation
-#'
-#' Calculates the net solar or shortwave radiation for a given location based on
-#' incoming solar radiation timeseries. Based on Equation 38 in Allen et al.
-#' (1998).
-#'
-#' @references Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
-#'   evapotranspiration: Guidelines for computing crop water requirements. Rome:
-#'   FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
-#'
-#' @param Rs incoming solar radiation (MJ/m^2/timestep)
-#' @param albedo albedo or canopy reflection coefficient (-). Defaults to 0.23
-#'               for the hypothetical grass reference crop.
-#'
-#' @return \item{Rns}{Net solar or shortwave radiation (MJ/m^2/timestep)}
-#'
-#' @export
-FAO_Rns <- function(Rs, albedo = 0.23){
-  Rns <- (1 - albedo)*Rs
-  return(Rns)
 }
 
 # ------------------------------------------------------------------------------
@@ -131,7 +183,7 @@ FAO_Rns <- function(Rs, albedo = 0.23){
 #' @return \item{Rso}{clear-sky solar radiation (MJ/m^2/day)}
 #'
 #' @export
-FAO_Rso <- function(Ra, z){
+R_so <- function(Ra, z){
   Rso   <- (0.75 + 2e-5*z)*Ra
   return(Rso)
 }
@@ -164,7 +216,7 @@ FAO_Rso <- function(Ra, z){
 #' @import lubridate
 #'
 #' @export
-FAO_Ra_night_adjusted <- function(datetimes, phi, Lm, Lz, Gsc = 0.0820){
+R_a_adj <- function(datetimes, phi, Lm, Lz, Gsc = 0.0820){
   tL_night   <- NA
   tmid_night <- NA
   for (i in 1:(length(datetimes)-1)) {
@@ -174,12 +226,12 @@ FAO_Ra_night_adjusted <- function(datetimes, phi, Lm, Lz, Gsc = 0.0820){
     J     <- yday(tmid)
 
     # Sun position stuff
-    dr    <- FAO_inverse_dist(J)
-    delta <- FAO_declination(J)
+    dr    <- inverse_dist(J)
+    delta <- declination(J)
 
     # Solar time angles
-    omega_sunset <- FAO_hour_angle_sunset(phi, delta)
-    omega        <- FAO_hour_angle(tmid, tL, Lm, Lz = 90)
+    omega_sunset <- hour_angle_sunset(phi, delta)
+    omega        <- hour_angle(tmid, tL, Lm, Lz = 90)
     omega_mid    <- (omega$omega1 + omega$omega2)/2
 
     # Check if night or just before sunset, adjust omega values if needed
@@ -235,7 +287,7 @@ FAO_Ra_night_adjusted <- function(datetimes, phi, Lm, Lz, Gsc = 0.0820){
 #' @import lubridate
 #'
 #' @export
-FAO_Ra <- function(dt, datetimes, phi, Lm, Lz, Gsc = 0.0820){
+R_a <- function(dt, datetimes, phi, Lm, Lz, Gsc = 0.0820){
   # Day and time
   if (dt == "hourly") {
     for (i in 1:(length(datetimes)-1)){
@@ -249,22 +301,30 @@ FAO_Ra <- function(dt, datetimes, phi, Lm, Lz, Gsc = 0.0820){
   J      <- yday(tmid)
 
   # Sun position stuff
-  delta  <- FAO_declination(J)
-  dr     <- FAO_inverse_dist(J)
+  delta  <- declination(J)
+  dr     <- inverse_dist(J)
 
   # Ra
   C  <- (24*60/pi)*Gsc*dr
   if (dt == "hour") {
-    omega   <- FAO_hour_angle(tmid, tL, Lm, Lz = 90)
+    omega   <- hour_angle(tmid, tL, Lm, Lz = 90)
     omega1  <- omega$omega1
     omega2  <- omega$omega2
     Ra      <- C*((omega2-omega1)*sin(phi)*sin(delta) +
                     cos(phi)*cos(delta)*(sin(omega2) - sin(omega1)))
   } else {
-    omega_s <- FAO_hour_angle_sunset(phi, delta)
+    omega_s <- hour_angle_sunset(phi, delta)
     Ra      <- C*(omega_s*sin(phi)*sin(delta) + cos(phi)*cos(delta)*sin(omega_s))
   }
   return(Ra)
+
+
+
+
+
+
+
+
 }
 
 # ------------------------------------------------------------------------------
@@ -283,7 +343,7 @@ FAO_Ra <- function(dt, datetimes, phi, Lm, Lz, Gsc = 0.0820){
 #' @return \item{dr}{inverse relative distance Earth-Sun (unitless)}
 #'
 #' @export
-FAO_inverse_dist <- function(J) {
+inverse_dist <- function(J) {
   dr <- 1 + 0.033*cos(2*pi*J/365)
   return(dr)
 }
@@ -304,7 +364,7 @@ FAO_inverse_dist <- function(J) {
 #' @return \item{delta}{solar declination (radians)}
 #'
 #' @export
-FAO_declination <- function(J) {
+declination <- function(J) {
   delta <- 0.409*sin(2*pi*J/365 - 1.39)
   return(delta)
 }
@@ -326,7 +386,7 @@ FAO_declination <- function(J) {
 #' @return \item{omega_s}{sunset hour angle (radians)}
 #'
 #' @export
-FAO_hour_angle_sunset <- function(phi, delta) {
+hour_angle_sunset <- function(phi, delta) {
   omega_s <- acos(-tan(phi)*tan(delta))
   return(omega_s)
 }
@@ -358,7 +418,7 @@ FAO_hour_angle_sunset <- function(phi, delta) {
 #' @import lubridate
 #'
 #' @export
-FAO_hour_angle <- function(tmid, tL, Lm, Lz) {
+hour_angle <- function(tmid, tL, Lm, Lz) {
   J    <- yday(tmid)
   tmid <- hour(tmid)
   tL   <- hour(seconds_to_period(tL))
@@ -375,80 +435,12 @@ FAO_hour_angle <- function(tmid, tL, Lm, Lz) {
 }
 
 # ------------------------------------------------------------------------------
-#' Net Radiation at Water Temperature
-#'
-#' Calculates the net radiation for a lake as a function of water temperature
-#' based on McMahon et al. (2013) Equation S11.25.
-#'
-#' @references McMahon, T. A., Peel, M. C., Lowe, L., Srikanthan, R., and
-#'   McVicar, T. R.: Estimating actual, potential, reference crop and pan
-#'   evaporation using standard meteorological data: a pragmatic synthesis,
-#'   Hydrol. Earth Syst. Sci., 17, 1331–1363,
-#'   https://doi.org/10.5194/hess-17-1331-2013, 2013.
-#'
-#' @inheritParams lake_evap
-#' @param albedo albedo of the lake, defaults to albedo for water, or 0.08.
-#' @param Gsc solar constant (MJ/m^2/min). Defaults to 0.0820 MJ/m^2/min.
-#' @param SBc Stefan-Boltzman constant (MJ/m^2/day). Defaults to 4.903e-9
-#'            MJ/m^2/day.
-#'
-#' @return {Rnwb}{net radiation (MJ/m^2/day) at water temperature}
-#'
-#' @export
-lake_Rn <- function(loc, lake, weather, albedo = 0.08, Gsc = 0.0820,
-                    SBc = 4.903e-9) {
-
-  Rns  <- FAO_Rns(weather$Rs, albedo)
-  Ra   <- FAO_Ra(weather$dt, weather$datetimes, loc$phi, loc$Lm, loc$Lz, Gsc)
-  Rso  <- FAO_Rso(Ra, loc$z)
-  Cf   <- cloud_factor(weather$Rs, Rso)
-  Ril  <- lake_Ril(Cf, weather$atmp, SBc)
-  wtmp <- lake_wtmp(loc, lake, weather)
-  Rol  <- lake_Rol(wtmp, SBc)
-
-  Rn  <- Rns + (Ril - Rol)
-
-  return(Rn)
-}
-
-# ------------------------------------------------------------------------------
-#' Net Radiation at Wet Bulb Temperature
-#'
-#' Calculates the net radiation for a lake as a function of wet bulb temperature
-#' based on McMahon et al. (2013) Equation S11.31.
-#'
-#' @references McMahon, T. A., Peel, M. C., Lowe, L., Srikanthan, R., and
-#'   McVicar, T. R.: Estimating actual, potential, reference crop and pan
-#'   evaporation using standard meteorological data: a pragmatic synthesis,
-#'   Hydrol. Earth Syst. Sci., 17, 1331–1363,
-#'   https://doi.org/10.5194/hess-17-1331-2013, 2013.
-#'
-#' @inheritParams lake_Rn
-#'
-#' @return {Rnwb}{net radiation (MJ/m^2/day) at wet-bulb temperature}
-#'
-#' @export
-wet_bulb_Rn <- function(loc, weather, albedo = 0.08, Gsc = 0.0820,
-                        SBc = 4.903e-9) {
-
-  Rns   <- FAO_Rns(weather$Rs, albedo)
-  Ra    <- FAO_Ra(weather$dt, weather$datetimes, loc$phi, loc$Lm, loc$Lz, Gsc)
-  Rso   <- FAO_Rso(Ra, loc$z)
-  Cf    <- cloud_factor(weather$Rs, Rso)
-  Ril   <- lake_Ril(Cf, weather$atmp, SBc)
-  wbtmp <- wet_bulb_tmp(weather$atmp, weather$RH)
-  Rolwb <- wet_bulb_Rol(weather$atmp, wbtmp, SBc)
-
-  Rnwb  <- Rns + (Ril - Rolwb)
-
-  return(Rnwb)
-}
-
-# ------------------------------------------------------------------------------
 #' Outgoing Longwave Radiation at Wet Bulb Temperature
 #'
-#' Calculates the outgoing longwave radiation for a lake as a function of wet
-#' bulb temperature based on McMahon et al. (2013) Equation S11.32.
+#' Calculates the outgoing longwave radiation for a lake as a function of lake
+#' temperature ("McJannet"; McMahon et al., 2013, Equation S11.27) or as a
+#' function of wet bulb temperature  ("wet_bulb"; McMahon et al., 2013, Equation
+#' S11.32).
 #'
 #' @references McMahon, T. A., Peel, M. C., Lowe, L., Srikanthan, R., and
 #'   McVicar, T. R.: Estimating actual, potential, reference crop and pan
@@ -456,46 +448,32 @@ wet_bulb_Rn <- function(loc, weather, albedo = 0.08, Gsc = 0.0820,
 #'   Hydrol. Earth Syst. Sci., 17, 1331–1363,
 #'   https://doi.org/10.5194/hess-17-1331-2013, 2013.
 #'
-#' @param atmp air temperature (degrees C). When dt is "daily" or larger,
-#'             argument should be a list with elements "min" and "max" for daily
-#'             min and max temperatures. When dt is "hourly", argument should be
-#'             a vector with hourly recorded temperatures.
-#' @param wbtmp daily wet bulb temperature (degrees C).
+#' @param type type of outgoing longwave radiation function to use. Defaults to
+#'             "McJannet" for outgoing longwave radiation at lake temperature.
+#'             Set to "wet_bulb" for outgoing longwave radiation at wet-bulb
+#'             temperature.
+#' @param tmp1 daily lake water temperature (if "McJannet") or wet bulb
+#'             temperature (if "wet_bulb") (degrees C).
+#' @param tmp2 defaults to NULL. If "wet_bulb", set to air temperature (degrees
+#'             C). When dt is "daily" or larger, argument should be a list with
+#'             elements "min" and "max" for daily min and max temperatures. When
+#'             dt is "hourly", argument should be a vector with hourly recorded
+#'             temperatures.
 #' @param SBc Stefan-Boltzman constant (MJ/m^2/day). Defaults to 4.903e-9
 #'            MJ/m^2/day.
 #'
-#' @return {Rolwb}{outgoing longwaver radiation (MJ/m^2/day) at wet-bulb
-#'                 temperature}
+#' @return {Rol}{outgoing longwave radiation (MJ/m^2/day)}
 #'
 #' @export
-wet_bulb_Rol <- function(atmp, wbtmp, SBc = 4.903e-9) {
-  if (class(atmp) == "list") { atmp <- (atmp$max + atmp$min)/2 }
-  Rolwb <- SBc*(atmp + 273.15)^4 + 4*SBc*(atmp + 273.15)^3*(wbtmp - atmp)
-  return(Rolwb)
-}
-
-# ------------------------------------------------------------------------------
-#' Outgoing Longwave Radiation at Water Temperature
-#'
-#' Calculates the outgoing longwave radiation for a lake as a function of wet
-#' bulb temperature based on McMahon et al. (2013) Equation S11.27.
-#'
-#' @references McMahon, T. A., Peel, M. C., Lowe, L., Srikanthan, R., and
-#'   McVicar, T. R.: Estimating actual, potential, reference crop and pan
-#'   evaporation using standard meteorological data: a pragmatic synthesis,
-#'   Hydrol. Earth Syst. Sci., 17, 1331–1363,
-#'   https://doi.org/10.5194/hess-17-1331-2013, 2013.
-#'
-#' @param wtmp daily water temperature (degrees C).
-#' @param SBc Stefan-Boltzman constant (MJ/m^2/day). Defaults to 4.903e-9
-#'            MJ/m^2/day.
-#'
-#' @return {Rol}{outgoing longwaver radiation (MJ/m^2/day) at the temperature of
-#'               the water}
-#'
-#' @export
-lake_Rol <- function(wtmp, SBc = 4.903e-9) {
-  Rol <- 0.97*SBc*(wtmp + 273.15)^4
+R_ol <- function(type = "McJannet", tmp1, tmp2 = NULL, SBc = 4.903e-9) {
+  if (type == "McJannet") {
+    # OUTGOING RADIATION AT LAKE TEMPERATURE -----------------------------------
+    Rol <- 0.97*SBc*(tmp1 + 273.15)^4
+  } else if (type == "wet_bulb") {
+    # OUTGOING RADIATION AT WET-BULB TEMPERATURE -------------------------------
+    if (class(tmp2) == "list") { tmp2 <- (tmp2$max + tmp2$min)/2 }
+    Rol <- SBc*(tmp2 + 273.15)^4 + 4*SBc*(tmp2 + 273.15)^3*(tmp1 - tmp2)
+  }
   return(Rol)
 }
 
@@ -522,7 +500,7 @@ lake_Rol <- function(wtmp, SBc = 4.903e-9) {
 #' @return {Cf}{the fraction of cloud cover (-)}
 #'
 #' @export
-lake_Ril <- function(Cf, atmp, SBc = 4.903e-9) {
+R_il <- function(Cf, atmp, SBc = 4.903e-9) {
   if (class(atmp) == "list") { atmp <- (atmp$max + atmp$min)/2 }
   Ril <- (Cf + (1 - Cf)*(1 - (0.261*exp(-7.77e-4*atmp^2))))*SBc*(atmp + 273.15)^4
   return(Ril)

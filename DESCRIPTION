@@ -1,10 +1,11 @@
-Package: H2Oevap
+Package: CSLSevap
 Type: Package
-Title: FAO Penman-Monteith Evapotranspiration
+Title: Evapo(transpi)ration Calculations
 Version: 0.1.0
 Author: Carolyn Voter <cvoter@wisc.edu>
 Maintainer: Carolyn Voter <cvoter@wisc.edu>
-Description: Calculates FAO Penman-Monteith reference ET.
+Description: Multiple ways of calculating evapo(transpi)ration.
+    Includes Penman-Monteith RET and lake evaporation (McJannet method).
 Imports:
   lubridate,
 	rlang,

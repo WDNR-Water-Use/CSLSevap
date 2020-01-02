@@ -1,17 +1,17 @@
 # vapour_functions.R
 # Includes:
-# - FAO_eo
-# - FAO_mean_es
-# - FAO_mean_ea
-# - FAO_vpd
-# - FAO_slope_es_curve
-# - FAO_psychrometric_constant
+# - vp_sat
+# - vp_sat_mean
+# - vp_act_mean
+# - vp_deficit
+# - vp_sat_slope
+# - psychrometric_constant
 # - latent_heat_vapor
-# - dew_tmp
-# - wet_bulb_tmp
+# - tmp_dew
+# - tmp_wet_bulb
 #
 # ------------------------------------------------------------------------------
-#' FAO Saturation Vapour Pressure
+#' Saturation Vapour Pressure
 #'
 #' Calculates the saturation vapour pressure at a given temperature based on
 #' equation 11 of Allen et al. (1998).
@@ -26,18 +26,17 @@
 #'
 #' @export
 
-FAO_eo <- function(tmp) {
+vp_sat <- function(tmp) {
   eo <- 0.6108*exp(17.27*tmp/(237.3 + tmp))
   return(eo)
 }
 
 # ------------------------------------------------------------------------------
-#' FAO Mean Saturation Vapour Pressure - Daily Timestep or Larger
+#' Mean Saturation Vapour Pressure
 #'
-#' Calculates the mean saturation vapour pressure for a time period (daily
-#' timestep or larger) using the mean daily minimum temperature and the mean
-#' daily maximum temperature during that time period. Based on equation 12 of
-#' Allen et al. (1998).
+#' Calculates the mean saturation vapour pressure for an hourly, daily, or
+#' larger time period based on Equation 12 (for daily or larger timestep) on pg.
+#' 36 of Allen et al. (1998).
 #'
 #' @references Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
 #'   evapotranspiration: Guidelines for computing crop water requirements. Rome:
@@ -53,20 +52,21 @@ FAO_eo <- function(tmp) {
 #'
 #' @export
 
-FAO_mean_es <- function(atmp) {
+vp_sat_mean <- function(atmp) {
   if (class(atmp) == "list"){
-    es <- (FAO_eo(atmp$max) + FAO_eo(atmp$min))/2
+    es <- (vp_sat(atmp$max) + vp_sat(atmp$min))/2
   } else {
-    es <- FAO_eo(atmp)
+    es <- vp_sat(atmp)
   }
   return(es)
 }
 
 # ------------------------------------------------------------------------------
-#' FAO Mean Actual Vapour Pressure - Daily Timestep or Larger
+#' Mean Actual Vapour Pressure
 #'
-#' Calculates the mean saturation vapour pressure for an hourly, daily, or
-#' larger time period based on Equation 17 (for daily or larger timestep) or pg. of Allen et al. (1998).
+#' Calculates the mean actual vapour pressure for an hourly, daily, or larger
+#' time period based on Equation 17 (for daily or larger timestep) on pg. 38 of
+#' Allen et al. (1998).
 #'
 #' @references Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
 #'   evapotranspiration: Guidelines for computing crop water requirements. Rome:
@@ -86,17 +86,17 @@ FAO_mean_es <- function(atmp) {
 #'
 #' @export
 
-FAO_mean_ea <- function(atmp, RH) {
+vp_act_mean <- function(atmp, RH) {
   if (class(atmp) == "list") {
-    ea <- (FAO_eo(atmp$min)*RH$max/100 + FAO_eo(atmp$max)*RH$min/100)/2
+    ea <- (vp_sat(atmp$min)*RH$max/100 + vp_sat(atmp$max)*RH$min/100)/2
   } else {
-    ea <- FAO_eo(atmp)*RH/100
+    ea <- vp_sat(atmp)*RH/100
   }
   return(ea)
 }
 
 # ------------------------------------------------------------------------------
-#' FAO Vapour Pressure Deficit
+#' Vapour Pressure Deficit
 #'
 #' Calculates the vapour pressure deficit for a given time period (daily timestep
 #' or larger) using the mean daily minimum temperature, mean daily maximum
@@ -120,15 +120,15 @@ FAO_mean_ea <- function(atmp, RH) {
 #'
 #' @export
 
-FAO_vpd <- function(atmp, RH) {
-  ea  <- FAO_mean_ea(atmp, RH)
-  es  <- FAO_mean_es(atmp)
+vp_deficit <- function(atmp, RH) {
+  ea  <- vp_act_mean(atmp, RH)
+  es  <- vp_sat_mean(atmp)
   vpd <- es - ea
   return(vpd)
 }
 
 # ------------------------------------------------------------------------------
-#' FAO Slope of Saturation Vapour Pressure Curve
+#' Slope of Saturation Vapour Pressure Curve
 #'
 #' Calculates the slope of the saturation vapour ressure curve (i.e., the slope
 #' of the relationship between saturation vapour pressure and temperature) based
@@ -148,17 +148,17 @@ FAO_vpd <- function(atmp, RH) {
 #'
 #' @export
 
-FAO_slope_es_curve <- function(atmp) {
+vp_sat_slope <- function(atmp) {
   if (class(atmp) == "list"){
     atmp <- (atmp$min + atmp$max)/2
   }
-  Delta <- (4098*(FAO_eo(atmp)))/
+  Delta <- (4098*(vp_sat(atmp)))/
            ((atmp + 237.3)^2)
   return(Delta)
 }
 
 # ------------------------------------------------------------------------------
-#' FAO Psychrometric Constant
+#' Psychrometric Constant
 #'
 #' Calculates the psychrometric constant for a given elevation based on Equation
 #' 7 and 8 in Allen et al. (1998).
@@ -182,8 +182,8 @@ FAO_slope_es_curve <- function(atmp) {
 #'
 #' @export
 
-FAO_psychrometric_constant <- function(z, atmp = NULL, lambda = 2.45,
-                                       cp = 1.013e-3, epsilon = 0.622) {
+psychrometric_constant <- function(z, atmp = NULL, lambda = 2.45,
+                                   cp = 1.013e-3, epsilon = 0.622) {
   #If air temp provided, use to calculate latent heat of vaporization
   if (is.null(atmp) == FALSE){lambda <- latent_heat_vapor(atmp)}
 
@@ -221,10 +221,10 @@ latent_heat_vapor <- function(atmp) {
 #' (2013) Equation S2.3
 #'
 #' @references McMahon, T. A., Peel, M. C., Lowe, L., Srikanthan, R., and
-#'   McVicar, T. R.: Estimating actual, potential, reference crop and pan
+#'   McVicar, T. R. (2013). Estimating actual, potential, reference crop and pan
 #'   evaporation using standard meteorological data: a pragmatic synthesis,
-#'   Hydrol. Earth Syst. Sci., 17, 1331–1363,
-#'   https://doi.org/10.5194/hess-17-1331-2013, 2013.
+#'   Hydrol. Earth Syst. Sci., 17, 1331–1363.
+#'   https://doi.org/10.5194/hess-17-1331-2013.
 #'
 #' @param atmp air temperature (degrees C). When dt is "daily" or larger,
 #'             argument should be a list with elements "min" and "max" for daily
@@ -239,8 +239,8 @@ latent_heat_vapor <- function(atmp) {
 #'
 #' @export
 
-dew_tmp <- function(atmp, RH) {
-  ea     <- FAO_mean_ea(atmp, RH)
+tmp_dew <- function(atmp, RH) {
+  ea     <- vp_act_mean(atmp, RH)
   dewtmp <- (116.9 + 237.3*log(ea))/(16.78 - log(ea))
   return(dewtmp)
 }
@@ -271,8 +271,8 @@ dew_tmp <- function(atmp, RH) {
 #'
 #' @export
 
-wet_bulb_tmp <- function(atmp, RH) {
-  ea     <- FAO_mean_ea(atmp, RH)
+tmp_wet_bulb <- function(atmp, RH) {
+  ea     <- vp_act_mean(atmp, RH)
   dewtmp <- dew_tmp(atmp, RH)
 
   if (class(atmp) == "list"){ atmp <- (atmp$max + atmp$min)/2 }

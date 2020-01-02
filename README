@@ -1,0 +1,35 @@
+# CSLSevap
+
+CSLSevap is an R package containing multiple evaporation functions useful to the Wisconsin Department of Natural Resources Central Sands Lakes Study (CSLS). Included evapo(transpir)ation approaches include:
+
+ * FAO Penman-Monteith Reference Evapotranspiration
+ * McJannet lake evaporation
+ 
+## Installation
+
+To install from within the WI DNR (assumes you're using R Studio and are familiar with installing other packages):
+
+ 1. Navigate to the CSLSevap package by either:  
+    * Opening `CSLSevap.proj` from the CSLSevap folder (Z:\WQWT_PROJECTS\WY_MS_Monitoring\2018 Summer Field Crew\Central Sands Lake Study\Analysis_2019\CSLSevap) (preferred)  
+    * Set your working directory to the CSLSevap folder `setwd("Z:/WQWT_PROJECTS/WY_MS_Monitoring/2018 Summer Field Crew/Central Sands Lake Study/Analysis_2019/CSLSevap")`  
+    
+    **Note:** If you want to be able to knit an Rmd file that is saved within this package, you must have the shared network mapped to a letter drive (e.g., "Z:/" for "//central/water/") and you must open the .proj workspace (or set your working directory) via this letter drive. If you don't, knitting will fail with a less-than-helpful error message (that doesn't mention anything about the letter drive requirement).
+ 2. While your working directory is set to the top level of `CSLSevap`, use the R package `devtools` to install locally.
+    ```R
+	install.packages("devtools")
+	devtools::install()
+	```
+## Package Organization
+
+This package is organized based on [R package conventions](http://r-pkgs.had.co.nz/) and includes the following components:
+
+ * Code (`R/`)
+ * Package metadata (`DESCRIPTION`)
+ * Code and data documentation (`man/`)
+ * Tests (`tests/`)
+
+To access package documentation from within RStudio:
+
+ * For help on a specific function, use `?function_name` as usual
+ * For a full list of available functions, go to the `Packages` tab within the RStudio workspace and click on `CSLSevap`
+

@@ -1,4 +1,4 @@
 library(testthat)
-library(H2Oevap)
+library(CSLSevap)
 
-test_check("H2Oevap")
+test_check("CSLSevap")
