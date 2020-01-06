@@ -1,6 +1,6 @@
 #wind_functions.R
 # Includes:
-# - u2
+# - u2_fcn
 # - uz_to_u10
 # - u_fcn
 # - aero_resist
@@ -23,8 +23,8 @@
 #'
 #' @export
 
-u2 <- function(uz, z = 10) {
-  u2 <- uz*4.87/log(67.8*z - 5.42)
+u2_fcn <- function(uz, z = 10) {
+  u2   <- uz*4.87/log(67.8*z - 5.42)
   return(u2)
 }
 
@@ -107,8 +107,8 @@ u_fcn <- function(u10, A) {
 
 aero_resist <- function(uz, wind_z, z0, A, lake_z, rho_a = 1.20, ca = 0.001013){
   u10   <- uz_to_u10(uz, wind_z, z0)
-  ufcn  <- wind_fcn(u10, A)
-  gamma <- FAO_psychrometric_constant(lake_z)
+  ufcn  <- u_fcn(u10, A)
+  gamma <- psychrometric_constant(lake_z)
   ra    <- rho_a*ca/(gamma*ufcn/(60*60*24))
   return(ra)
 }

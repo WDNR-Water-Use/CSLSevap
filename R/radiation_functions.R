@@ -1,29 +1,12 @@
 # radiation_functions.R
 # Includes:
-# - FAO_Rn
-# - FAO_Rnl
-# - FAO_Rns
-# - FAO_Rso
-# - FAO_Ra_night_adjusted
-# - FAO_Ra
-# - FAO_inverse_dist
-# - FAO_declination
-# - FAO_hour_angle_sunset
-# - FAO_hour_angle
-# - lake_Rn
-# - wet_bulb_Rn
-# - wet_bulb_Rol
-# - lake_Rol
-# - lake_Ril
-# - cloud_factor
-
 # - R_n (FAO, McJannet, wet_bulb)
 # - R_nl
 # - R_ns
 # - R_ol (McJannet, wet_bulb)
 # - R_il
 # - R_so
-# - R_a (normal, night-adjusted)
+# - R_a
 # - inverse_dist
 # - declination
 # - hour_angle_sunset
@@ -66,25 +49,19 @@ R_n <- function(type = "FAO", loc, lake, weather, albedo){
   Rns  <- R_ns(weather$Rs, albedo)
 
   # Longwave
+  Ra   <- R_a(weather$dt, weather$datetimes, loc$phi, loc$Lm, loc$Lz)
+  Rso  <- R_so(Ra, loc$z)
   if (type == "FAO") {
     # FAO NET RADIATION --------------------------------------------------------
-    if (weather$dt == "hourly") {
-      Ra <- R_a_adj(weather$datetimes, loc$phi, loc$Lm, loc$Lz)
-    } else {
-      Ra <- R_a(weather$dt, weather$datetimes, loc$phi, loc$Lm, loc$Lz)
-    }
-    Rso  <- R_so(Ra, loc$z)
     ea   <- vp_act_mean(weather$atmp, weather$RH)
     Rnl  <- R_nl(weather$dt, weather$Rs, Rso, ea, weather$atmp)
   } else {
     # MCJANNET LAKE EVAPORATION ------------------------------------------------
-    Ra   <- R_a(weather$dt, weather$datetimes, loc$phi, loc$Lm, loc$Lz)
-    Rso  <- R_so(Ra, loc$z)
     Cf   <- cloud_factor(weather$Rs, Rso)
     Ril  <- R_il(Cf, weather$atmp)
     if (type == "McJannet") {
       # At Lake Temperature ----------------------------------------------------
-      wtmp <- tmp_water(loc, lake, weather)
+      wtmp <- tmp_water(loc, lake, weather, albedo)
       Rol  <- R_ol(type, wtmp)
     } else if (type == "wet_bulb") {
       # At Wet-Bulb Temperature ------------------------------------------------
@@ -98,7 +75,6 @@ R_n <- function(type = "FAO", loc, lake, weather, albedo){
   Rn   <- Rns - Rnl
   return(Rn)
 }
-
 
 # ------------------------------------------------------------------------------
 #' Net Solar or Shortwave Radiation
@@ -189,71 +165,6 @@ R_so <- function(Ra, z){
 }
 
 # ------------------------------------------------------------------------------
-#' Nighttime Extraterrestrial Solar Radiation
-#'
-#' Calculates the nighttime extraterrestrial radiation for a given location and
-#' timestep. Based on recomendations on p. 75 in Allen et al. (1998) for hourly
-#' ET caclculations.
-#'
-#'
-#' @references Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
-#'   evapotranspiration: Guidelines for computing crop water requirements. Rome:
-#'   FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
-#'
-#' @param datetimes hourly timeseries to use in calculations [POSIXct].
-#' @param phi latitude of the location (radians). Positive for northern
-#'            hemisphere, negative for southern hemisphere.
-#' @param Lm longitude of the measurement site (degrees west of Greenwich)
-#' @param Lz longitude of the center of the local time zone (degrees west of
-#'   Greenwich). For example, Lz = 75, 90, 105 and 120° for the Eastern,
-#'   Central, Rocky Mountain and Pacific time zones (United States) and Lz = 0°
-#'   for Greenwich, 330° for Cairo (Egypt), and 255° for Bangkok (Thailand).
-#' @param Gsc solar constant (MJ/m^2/min). Defaults to 0.0820 MJ/m^2/min.
-#'
-#' @return \item{Ra}{extraterrestrial radiation (MJ/m^2/hour) with nighttime Ra
-#'                   values adjusted per Allen et al. (1998)}
-#'
-#' @import lubridate
-#'
-#' @export
-R_a_adj <- function(datetimes, phi, Lm, Lz, Gsc = 0.0820){
-  tL_night   <- NA
-  tmid_night <- NA
-  for (i in 1:(length(datetimes)-1)) {
-    # Date and times
-    tL    <- int_length(datetimes[i] %--% datetimes[i+1])
-    tmid  <- datetimes[i] + seconds(tL/2)
-    J     <- yday(tmid)
-
-    # Sun position stuff
-    dr    <- inverse_dist(J)
-    delta <- declination(J)
-
-    # Solar time angles
-    omega_sunset <- hour_angle_sunset(phi, delta)
-    omega        <- hour_angle(tmid, tL, Lm, Lz = 90)
-    omega_mid    <- (omega$omega1 + omega$omega2)/2
-
-    # Check if night or just before sunset, adjust omega values if needed
-    if ((omega_mid >= omega_sunset-0.79) & (omega_mid <= omega_sunset-0.52)) {
-      tL_night   <- tL
-      tmid_night <- tmid
-    } else if (omega_mid > omega_sunset | omega_mid < -omega_sunset) {
-      omega      <- FAO_hour_angle(tmid_night, tL_night, Lm, Lz)
-    }
-    omega1       <- omega$omega1
-    omega2       <- omega$omega2
-
-    # Calculate Ra, with nightime substitutions made for nighttime values
-    C            <- (24*60/pi)*Gsc*dr
-    Ra[i]        <- C*((omega2-omega1)*sin(phi)*sin(delta) +
-                         cos(phi)*cos(delta)*(sin(omega2) - sin(omega1)))
-  }
-  Ra <- c(Ra, tail(Ra,1))
-  return(Ra)
-}
-
-# ------------------------------------------------------------------------------
 #' Extraterrestrial Solar Radiation
 #'
 #' Calculates the extraterrestrial radiation for a given location and timestep.
@@ -294,7 +205,7 @@ R_a <- function(dt, datetimes, phi, Lm, Lz, Gsc = 0.0820){
       tL[i]   <- int_length(datetimes[i] %--% datetimes[i+1])
       tmid[i] <- datetimes[i] + seconds(tL[i]/2)
     }
-    tmid   <- as_datetime(tmid)
+    tmid      <- as_datetime(tmid)
   } else {
     tmid <- datetimes
   }
@@ -303,28 +214,37 @@ R_a <- function(dt, datetimes, phi, Lm, Lz, Gsc = 0.0820){
   # Sun position stuff
   delta  <- declination(J)
   dr     <- inverse_dist(J)
+  C      <- (24*60/pi)*Gsc*dr
 
-  # Ra
-  C  <- (24*60/pi)*Gsc*dr
   if (dt == "hour") {
-    omega   <- hour_angle(tmid, tL, Lm, Lz = 90)
-    omega1  <- omega$omega1
-    omega2  <- omega$omega2
-    Ra      <- C*((omega2-omega1)*sin(phi)*sin(delta) +
-                    cos(phi)*cos(delta)*(sin(omega2) - sin(omega1)))
+    # HOURLY, NIGHT-ADJUSTED ---------------------------------------------------
+    for (i in 1:(length(datetimes)-1)){
+      # Solar time angles
+      omega_sunset <- hour_angle_sunset(phi, delta[i])
+      omega        <- hour_angle(tmid[i], tL[i], Lm, Lz = 90)
+      omega_mid    <- (omega$omega1 + omega$omega2)/2
+
+      # Check if night or just before sunset, adjust omega values if needed
+      if ((omega_mid >= omega_sunset-0.79) & (omega_mid <= omega_sunset-0.52)) {
+        tL_night   <- tL[i]
+        tmid_night <- tmid[i]
+      } else if (omega_mid > omega_sunset | omega_mid < -omega_sunset) {
+        omega      <- hour_angle(tmid_night, tL_night, Lm, Lz)
+      }
+      omega1       <- omega$omega1
+      omega2       <- omega$omega2
+
+      # Calculate Ra, with nightime substitutions made for nighttime values
+      Ra[i]        <- C[i]*((omega2-omega1)*sin(phi)*sin(delta[i]) +
+                           cos(phi)*cos(delta)*(sin(omega2) - sin(omega1)))
+    }
+    Ra <- c(Ra, tail(Ra,1))
   } else {
+    # DAILY --------------------------------------------------------------------
     omega_s <- hour_angle_sunset(phi, delta)
     Ra      <- C*(omega_s*sin(phi)*sin(delta) + cos(phi)*cos(delta)*sin(omega_s))
   }
   return(Ra)
-
-
-
-
-
-
-
-
 }
 
 # ------------------------------------------------------------------------------

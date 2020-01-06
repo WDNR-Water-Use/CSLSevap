@@ -4,6 +4,7 @@ library(lubridate)
 library(NISTunits)
 
 test_that("FAO Example #18 - Daily ET", {
+  method  <- "FAO"
   loc     <- list(z = 100,
                   phi = NISTdegTOradian(50 + 48/60),
                   Lm = NULL,
@@ -15,19 +16,19 @@ test_that("FAO Example #18 - Daily ET", {
                   Rs   = 22.07,
                   wind = 2.78,
                   wind_elev = 10)
+  albedo  <- list(ref_crop = 0.23, water = 0.08)
 
-  u2    <- FAO_u2(weather$wind, weather$wind_elev)
-  gamma <- FAO_psychrometric_constant(loc$z)
-  Delta <- FAO_slope_es_curve(weather$atmp)
-  ea    <- FAO_mean_ea(weather$atmp, weather$RH)
-  vpd   <- FAO_vpd(weather$atmp, weather$RH)
-  Ra    <- FAO_Ra(weather$dt, weather$datetimes, loc$phi, loc$Lm, oc$Lz)
-  Rso   <- FAO_Rso(Ra, loc$z)
-  Rnl   <- FAO_Rnl(weather$dt, weather$Rs, Rso, ea, weather$atmp)
-  Rn    <- FAO_Rn(loc, weather)
-  G     <- FAO_G(weather$dt, weather$datetimes, loc$phi, loc$Lm, loc$Lz, Rn,
-                 weather$atmp)
-  ET    <- FAO_evap(loc, weather)
+  u2    <- u2_fcn(weather$wind, weather$wind_elev)
+  gamma <- psychrometric_constant(loc$z)
+  Delta <- vp_sat_curve_slope(weather$atmp)
+  ea    <- vp_act_mean(weather$atmp, weather$RH)
+  vpd   <- vp_deficit(weather$atmp, weather$RH)
+  Ra    <- R_a(weather$dt, weather$datetimes, loc$phi, loc$Lm, oc$Lz)
+  Rso   <- R_so(Ra, loc$z)
+  Rnl   <- R_nl(weather$dt, weather$Rs, Rso, ea, weather$atmp)
+  Rn    <- R_n(method, loc, lake, weather, albedo$ref_crop)
+  G     <- heat_flux(method, loc, lake, weather, Rn)
+  ET    <- evaporation(method, loc, weather)
 
   expect_equal(u2, 2.079304, tolerance=1e-5)
   expect_equal(gamma, 0.06655628, tolerance=1e-5)
@@ -43,6 +44,7 @@ test_that("FAO Example #18 - Daily ET", {
 })
 
 test_that("FAO Example #17 - Monthly ET", {
+  method  <- "FAO"
   loc     <- list(z = 2,
                   phi = NISTdegTOradian(13 + 44/60),
                   Lm = NULL,
@@ -54,18 +56,20 @@ test_that("FAO Example #17 - Monthly ET", {
                   Rs   = c(1, 22.65),
                   wind = c(NA, 2),
                   wind_elev = 2)
+  albedo  <- list(ref_crop = 0.23, water = 0.08)
 
-  gamma <- FAO_psychrometric_constant(loc$z)
-  Delta <- FAO_slope_es_curve(weather$atmp)
-  es    <- FAO_mean_es(weather$atmp)
-  ea    <- FAO_mean_ea(weather$atmp, weather$RH)
-  vpd   <- FAO_vpd(weather$atmp, weather$RH)
-  Ra    <- FAO_Ra(weather$dt, weather$datetimes, loc$phi, loc$Lm, oc$Lz)
-  Rso   <- FAO_Rso(Ra, loc$z)
-  Rnl   <- FAO_Rnl(weather$dt, weather$Rs, Rso, ea, weather$atmp)
-  Rn    <- FAO_Rn(loc, weather)
-  G     <- FAO_G(weather$dt, weather$datetimes, loc$phi, loc$Lm, loc$Lz, Rn, weather$atmp)
-  ET    <- FAO_evap(loc, weather)
+  u2    <- u2_fcn(weather$wind, weather$wind_elev)
+  gamma <- psychrometric_constant(loc$z)
+  Delta <- vp_sat_curve_slope(weather$atmp)
+  es    <- vp_sat_mean(weather$atmp)
+  ea    <- vp_act_mean(weather$atmp, weather$RH)
+  vpd   <- vp_deficit(weather$atmp, weather$RH)
+  Ra    <- R_a(weather$dt, weather$datetimes, loc$phi, loc$Lm, oc$Lz)
+  Rso   <- R_so(Ra, loc$z)
+  Rnl   <- R_nl(weather$dt, weather$Rs, Rso, ea, weather$atmp)
+  Rn    <- R_n(method, loc, lake, weather, albedo$ref_crop)
+  G     <- heat_flux(method, loc, lake, weather, Rn)
+  ET    <- evaporation(method, loc, weather)
 
   expect_equal(gamma, 0.06732263, tolerance=1e-5)
   expect_equal(Delta[2], 0.2458003, tolerance=1e-5)
@@ -81,6 +85,7 @@ test_that("FAO Example #17 - Monthly ET", {
 })
 
 test_that("McMahon S19 - McJannet Lake Evap", {
+  method  <- "McJannet"
   loc     <- list(z = 546,
                   phi = NISTdegTOradian(-23.7951),
                   Lm = NULL,
@@ -96,37 +101,38 @@ test_that("McMahon S19 - McJannet Lake Evap", {
                   wind = 0.5903,
                   wind_elev = 2,
                   z0 = 0.0002)
-  albedo  <- list(lake = 0.08)
+  albedo  <- list(ref_crop = 0.23, water = 0.08)
+
   u10     <- uz_to_u10(weather$wind, weather$wind_elev, weather$z0)
-  gamma   <- FAO_psychrometric_constant(loc$z)
-  ea      <- FAO_mean_ea(weather$atmp, weather$RH)
-  dewtmp  <- dew_tmp(weather$atmp, weather$RH)
-  wbtmp   <- wet_bulb_tmp(weather$atmp, weather$RH)
-  Deltawb <- FAO_slope_es_curve(wbtmp)
-  u_fcn   <- wind_fcn(u10, lake$A)
+  gamma   <- psychrometric_constant(loc$z)
+  ea      <- vp_act_mean(weather$atmp, weather$RH)
+  dewtmp  <- tmp_dew(weather$atmp, weather$RH)
+  wbtmp   <- tmp_wet_bulb(weather$atmp, weather$RH)
+  Deltawb <- vp_sat_curve_slope(wbtmp)
+  ufcn    <- u_fcn(u10, lake$A)
   ra      <- aero_resist(weather$wind, weather$wind_elev, weather$z0, lake$A,
                          loc$z)
-  Rns     <- FAO_Rns(weather$Rs, albedo$lake)
-  Ra      <- FAO_Ra(weather$dt, weather$datetimes, loc$phi, loc$Lm, loc$Lz)
-  Rso     <- FAO_Rso(Ra, loc$z)
+  Rns     <- R_ns(weather$Rs, albedo$water)
+  Ra      <- R_a(weather$dt, weather$datetimes, loc$phi, loc$Lm, loc$Lz)
+  Rso     <- R_so(Ra, loc$z)
   Cf      <- cloud_factor(weather$Rs, Rso)
-  Ril     <- lake_Ril(Cf, weather$atmp)
-  Rolwb   <- wet_bulb_Rol(weather$atmp, wbtmp)
-  Rnwb    <- wet_bulb_Rn(loc, weather, albedo$lake)
+  Ril     <- R_il(Cf, weather$atmp)
+  Rolwb   <- R_ol("wet_bulb", wbtmp, weather$atmp)
+  Rnwb    <- R_n("wet_bulb", loc, lake, weather, albedo$water)
   Ctime   <- time_const(loc, lake, weather)
-  eqtmp   <- lake_eqtmp(loc, lake, weather)
-  wtmp    <- lake_wtmp(loc, lake, weather)
-  Gw      <- lake_Gw(loc, lake, weather)
-  Rol     <- lake_Rol(wtmp, SBc = 4.903e-9)
-  Rn      <- lake_Rn(loc, lake, weather, albedo$lake)
-  Delta_w <- FAO_slope_es_curve(wtmp)
-  es_w    <- FAO_mean_es(wtmp)
-  ET      <- lake_evap(loc, lake, weather, albedo)
+  eqtmp   <- tmp_equil(loc, lake, weather, albedo)
+  wtmp    <- tmp_water(loc, lake, weather, albedo)
+  Gw      <- heat_flux(method, loc, lake, weather, albedo)
+  Rol     <- R_ol(method, wtmp)
+  Rn      <- R_n(method, loc, lake, weather, albedo$water)
+  Delta_w <- vp_sat_curve_slope(wtmp)
+  es_w    <- vp_sat_mean(wtmp)
+  ET      <- evaporation(method, loc, weather, lake)
 
   expect_equal(u10, 0.6934505, tolerance=1e-5)
   expect_equal(dewtmp, -1.158446, tolerance=1e-5)
   expect_equal(wbtmp, 6.630961, tolerance=1e-5)
-  expect_equal(u_fcn, 4.888717, tolerance=1e-5)
+  expect_equal(ufcn, 4.888717, tolerance=1e-5)
   expect_equal(ra, 340.1621, tolerance=1e-5)
   expect_equal(Rns, 15.81848, tolerance=1e-5)
   expect_equal(Cf, 0.08653416, tolerance=1e-5)

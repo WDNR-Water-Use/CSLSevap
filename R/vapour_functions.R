@@ -273,7 +273,7 @@ tmp_dew <- function(atmp, RH) {
 
 tmp_wet_bulb <- function(atmp, RH) {
   ea     <- vp_act_mean(atmp, RH)
-  dewtmp <- dew_tmp(atmp, RH)
+  dewtmp <- tmp_dew(atmp, RH)
 
   if (class(atmp) == "list"){ atmp <- (atmp$max + atmp$min)/2 }
 

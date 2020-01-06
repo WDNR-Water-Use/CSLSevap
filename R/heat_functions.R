@@ -25,30 +25,9 @@
 #'   Hydrol. Earth Syst. Sci., 17, 1331–1363,
 #'   https://doi.org/10.5194/hess-17-1331-2013, 2013.
 #'
-#' @param dt string indicating the timestep of input weather series. Expects
-#'            "hourly", "daily", or "monthly".
-#' @param datetimes datetimes of weather records [POSIXct]. If monthly
-#'                   timestep, make sure date is the 15th of each month.
-#' @param phi latitude of the location (radians). Positive for northern
-#'            hemisphere, negative for southern hemisphere.
-#' @param Lm longitude of the measurement site (degrees west of Greenwich)
-#' @param Lz longitude of the center of the local time zone (degrees west of
-#'            Greenwich). For example, Lz = 75, 90, 105 and 120° for the
-#'            Eastern, Central, Rocky Mountain and Pacific time zones (United
-#'            States) and Lz = 0° for Greenwich, 330° for Cairo (Egypt), and
-#'            255° for Bangkok (Thailand).
-#' @param Rn vector with net radiation (MJ/m^2/timestep)
-#' @param atmp If hourly timestep, vector of air temperature (degrees C)
-#'            corresponding with datetimes vector. If daily or monthly timestep,
-#'            list with two vectors, "min" and "max", with mean daily min and
-#'            max air temperature (degrees C) corresponding with datetimes
-#'            vector
-#'
-#'
 #' @inheritParams evap
 #' @param rho_w density of water (kg/m^3), defaults to 997.9 kg/m^3 at 20 deg C
 #' @param cw specific heat of water (MJ/kg/K), defaults to 0.00419
-#'
 #'
 #' @import lubridate
 #' @importFrom utils tail
@@ -56,19 +35,25 @@
 #' @return \item{G}{heat flux (MJ/m^2/hr)}
 #'
 #' @export
-heat_flux <- function(method, dt, datetimes, phi, Lm, Lz, Rn, atmp) {
-  (loc, lake, weather, rho_w = 997.9, cw = 0.00419)
+heat_flux <- function(method, loc, lake, weather, albedo,
+                      Rn = NULL, rho_w = 997.9, cw = 0.00419){
   if (method == "FAO") {
     # FAO SOIL HEAT FLUX -------------------------------------------------------
+    dt        <- weather$dt
+    datetimes <- weather$datetimes
+    atmp      <- weather$atmp
+    phi       <- loc$phi
+    Lm        <- loc$Lm
+    Lz        <- loc$Lz
     if (dt == "hourly"){
       for (i in 1:length(datetimes)-1){
         tL   <- int_length(datetimes[i] %--% datetimes[i+1])
         tmid <- datetimes[i] + seconds(tL/2)
         J    <- yday(tmid)
 
-        delta        <- FAO_declination(J)
-        omega_sunset <- FAO_hour_angle_sunset(phi, delta)
-        omega        <- FAO_hour_angle(tmid, tL, Lm, Lz)
+        delta        <- declination(J)
+        omega_sunset <- hour_angle_sunset(phi, delta)
+        omega        <- hour_angle(tmid, tL, Lm, Lz)
         omega_mid    <- (omega$omega1 + omega$omega2)/2
         if (omega_mid > omega_sunset | omega_mid < -omega_sunset) {
           night[i]   <- 1
@@ -98,7 +83,7 @@ heat_flux <- function(method, dt, datetimes, phi, Lm, Lz, Rn, atmp) {
   } else if (method == "McJannet"){ # end FAO soil heat flux
     # MCJANNET LAKE HEAT FLUX ----------------------------------------------------
     wtmp0   <- lake$wtmp0
-    wtmp    <- tmp_water(loc, lake, weather)
+    wtmp    <- tmp_water(loc, lake, weather, albedo)
     G       <- NULL
     if (length(lake$depth_m) == 1) {
       lake$depth_m <- rep(lake$depth_m, length(wtmp))
@@ -131,9 +116,9 @@ heat_flux <- function(method, dt, datetimes, phi, Lm, Lz, Rn, atmp) {
 #' @return {wtmp}{water temperature (degrees C)}
 #'
 #' @export
-tmp_water <- function(loc, lake, weather) {
+tmp_water <- function(loc, lake, weather, albedo) {
   lst   <- lake$lst
-  eqtmp <- tmp_equil(loc, lake, weather)
+  eqtmp <- tmp_equil(loc, lake, weather, albedo)
   Ctime <- time_const(loc, lake, weather)
   wtmp0 <- lake$wtmp0
   wtmp  <- NULL
@@ -163,20 +148,20 @@ tmp_water <- function(loc, lake, weather) {
 #'   Hydrol. Earth Syst. Sci., 17, 1331–1363,
 #'   https://doi.org/10.5194/hess-17-1331-2013, 2013.
 #'
-#' @inheritParams lake_evap
+#' @inheritParams evap
 #' @param SBc Stefan-Boltzman constant (MJ/m^2/day). Defaults to 4.903e-9
 #'            MJ/m^2/day.
 #'
 #' @return {eqtmp}{equilibrium temperature (degrees C)}
 #'
 #' @export
-tmp_equil <- function(loc, lake, weather, SBc = 4.903e-9) {
+tmp_equil <- function(loc, lake, weather, albedo, SBc = 4.903e-9) {
   u10     <- uz_to_u10(weather$wind, weather$wind_elev, weather$z0)
   ufcn    <- u_fcn(u10, lake$A)
   gamma   <- psychrometric_constant(loc$z)
   wbtmp   <- tmp_wet_bulb(weather$atmp, weather$RH)
   Deltawb <- vp_sat_curve_slope(wbtmp)
-  Rnwb    <- wet_bulb_Rn(loc, weather)
+  Rnwb    <- R_n("wet_bulb", loc, lake, weather, albedo$water)
 
   eqtmp   <- wbtmp + Rnwb/(4*SBc*(wbtmp + 273.15)^3 + ufcn*(Deltawb + gamma))
 

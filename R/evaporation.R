@@ -82,9 +82,6 @@
 #' @param ca specific heat of the air (MJ/kg/K), defaults to 0.001013 MJ/kg/K
 #' @param no_condensation defaults to TRUE to force negative evapotranspiration
 #'                        values (i.e., condensation) to zero
-#' @param Gsc solar constant (MJ/m^2/min). Defaults to 0.0820 MJ/m^2/min.
-#' @param SBc Stefan-Boltzman constant (MJ/m^2/day). Defaults to 4.903e-9
-#'            MJ/m^2/day.
 #'
 #' @return \item{evap}{Evapo(transpi)ration (mm/hour or mm/day)}
 #'
@@ -107,19 +104,18 @@ evaporation <- function(method = "FAO", loc = NULL, weather, lake = NULL,
     # Vapour parameters
     Delta <- vp_sat_curve_slope(weather$atmp)
     gamma <- psychrometric_constant(loc$z)
-    vpd   <- vpd(weather$atmp, weather$RH)
+    vpd   <- vp_deficit(weather$atmp, weather$RH)
 
     # Wind at 2m
     if (weather$wind_elev != 2){
-      weather$wind <- FAO_u2(weather$wind, weather$wind_elev)
+      weather$wind <- u2_fcn(weather$wind, weather$wind_elev)
     }
 
     # Radiation
     Rn <- R_n(method, loc, lake, weather, albedo$ref_crop)
 
     # Soil Heat
-    G  <- FAO_G(weather$dt, weather$datetimes, loc$phi, loc$Lm, loc$Lz, Rn,
-                weather$atmp)
+    G  <- heat_flux(method, loc, lake, weather, albedo, Rn)
 
     evap <- (0.408*Delta*(Rn - G) + gamma*(900/tmp_K)*weather$wind*vpd)/
             (Delta + gamma*(1 + 0.34*weather$wind))
@@ -130,7 +126,7 @@ evaporation <- function(method = "FAO", loc = NULL, weather, lake = NULL,
     ra   <- aero_resist(weather$wind, weather$wind_elev, weather$z0, lake$A, loc$z)
 
     # Lake water temperature
-    wtmp <- lake_wtmp(loc, lake, weather)
+    wtmp <- tmp_water(loc, lake, weather, albedo)
 
     # Vapour parameters
     Delta_w <- vp_sat_curve_slope(wtmp)
@@ -143,7 +139,7 @@ evaporation <- function(method = "FAO", loc = NULL, weather, lake = NULL,
     Rn <- R_n(method, loc, lake, weather, albedo$water)
 
     # Water Heat Flux
-    Gw <- heat_flux(method, loc, lake, weather)
+    Gw <- heat_flux(method, loc, lake, weather, albedo)
 
     # Lake evaporation
     evap <- (Delta_w*(Rn - Gw) + 60*60*24*rho_a*ca*(es_w - ea)/ra)/
