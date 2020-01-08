@@ -4,11 +4,23 @@
 #' given hourly inputs) using specified method. Options include:
 #' \enumerate{
 #'   \item "FAO" - FAO Penman-Montieth reference evapotranspiration (potential
-#'              evaporation for a reference grass crop) based on Allen et al.
-#'              (1998)
+#'                 evaporation for a reference grass crop) based on Allen et al.
+#'                 (1998) for hourly, daily, or monthly timestep.
 #'   \item "McJannet" - Daily lake evaporation based on the method in McJannet et al.
-#'                   (2008) as presented in McMahon et al. (2013)
+#'                      (2008) as presented in McMahon et al. (2013)
+#'   \item "Hamon" - Daily lake evaporation based on the unmodified Hamon method
+#'                   as presented in Harwell (2012)
 #' }
+#'
+#' When assessing which parameters are required for a given method, use the
+#' following guidelines:
+#' \itemize{
+#' \item "loc" - FAO (all), McJanet (all), Hamond (only "phi")
+#' \item "weather" - FAO (all but "z0"), McJanet (all), Hamond (only "datetimes"
+#'                   and "atmp" list with min and max daily atmp)
+#' \item "lake" - FAO (not required, use default NULL value), McJanet (all but
+#'                "lst"), Hamond (not required, use default NULL value).
+#'  }
 #'
 #' @references Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
 #'   evapotranspiration: Guidelines for computing crop water requirements. Rome:
@@ -26,7 +38,14 @@
 #'   Hydrol. Earth Syst. Sci., 17, 1331–1363.
 #'   https://doi.org/10.5194/hess-17-1331-2013.
 #'
-#' @param method denotes which evaporation method to use ("FAO" or "McJannet").
+#' @references Harwell, G.R., 2012, Estimation of evaporation from open water—A
+#'   review of selected studies, summary of U.S. Army Corps of Engineers data
+#'   collection and methods, and evaluation of two methods for estimation of
+#'   evaporation from five reservoirs in Texas: U.S. Geological Survey
+#'   Scientific Investigations Report 2012–5202, 96 p.
+#'
+#' @param method denotes which evaporation method to use ("FAO", "McJannet", or
+#'               "Hamon").
 #' @param loc a list with location information that includes:
 #' \itemize{
 #' \item "z" - elevation above mean sea level (m)
@@ -64,8 +83,8 @@
 #' \item "z0" - aerodynamic roughness of weather measurement site (m)
 #' }
 #'
-#' @param lake A list with lake data. Defaults to NULL, but for lake evaporation
-#'             calculations, should include:
+#' @param lake A list with lake data. Defaults to NULL, but for McJannet lake
+#'             evaporation calculations, should include:
 #' \itemize{
 #'   \item "A" - surface area of the lake (km^2).
 #'   \item "depth_m" - depth of the lake (m). Can be a static value or vector
@@ -89,6 +108,7 @@
 #' @return \item{evap}{Evapo(transpi)ration (mm/hour or mm/day)}
 #'
 #' @importFrom NISTunits NISTdegCtOk
+#' @import lubridate
 #'
 #' @export
 evaporation <- function(method = "FAO", loc, weather, lake = NULL,
@@ -147,6 +167,19 @@ evaporation <- function(method = "FAO", loc, weather, lake = NULL,
     # Lake evaporation
     evap <- (Delta_w*(Rn - Gw) + 60*60*24*rho_a*ca*(es_w - ea)/ra)/
             (lambda*(Delta_w + gamma))
+  } else if (method == "Hamon") {
+    # HAMON UNMODIFIED LAKE EVAPORATION ----------------------------------------
+    # Maximum possible daylight hours
+    J       <- yday(weather$datetimes)
+    delta   <- declination(J)
+    omega_s <- hour_angle_sunset(loc$phi, delta)
+    D       <- daylight_hours(omega_s)
+
+    # Saturated vapor density
+    svd <- sat_vapor_density(weather$atmp)
+
+    # Lake evaporation
+    evap <- 0.55*((D/12)^2)*(svd/100)
   }
 
   # Adjust for no condensation, if needed

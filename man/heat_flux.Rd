@@ -16,7 +16,8 @@ heat_flux(
 )
 }
 \arguments{
-\item{method}{denotes which evaporation method to use ("FAO" or "McJannet").}
+\item{method}{denotes which evaporation method to use ("FAO", "McJannet", or
+"Hamon").}
 
 \item{loc}{a list with location information that includes:
 \itemize{
@@ -31,8 +32,8 @@ heat_flux(
             330° for Cairo (Egypt), and 255° for Bangkok (Thailand).
 }}
 
-\item{lake}{A list with lake data. Defaults to NULL, but for lake evaporation
-            calculations, should include:
+\item{lake}{A list with lake data. Defaults to NULL, but for McJannet lake
+            evaporation calculations, should include:
 \itemize{
   \item "A" - surface area of the lake (km^2).
   \item "depth_m" - depth of the lake (m). Can be a static value or vector

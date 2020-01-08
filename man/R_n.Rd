@@ -25,8 +25,8 @@ include "McJannet" for net radiation at lake temperature and
             330° for Cairo (Egypt), and 255° for Bangkok (Thailand).
 }}
 
-\item{lake}{A list with lake data. Defaults to NULL, but for lake evaporation
-            calculations, should include:
+\item{lake}{A list with lake data. Defaults to NULL, but for McJannet lake
+            evaporation calculations, should include:
 \itemize{
   \item "A" - surface area of the lake (km^2).
   \item "depth_m" - depth of the lake (m). Can be a static value or vector

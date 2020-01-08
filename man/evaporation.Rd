@@ -16,7 +16,8 @@ evaporation(
 )
 }
 \arguments{
-\item{method}{denotes which evaporation method to use ("FAO" or "McJannet").}
+\item{method}{denotes which evaporation method to use ("FAO", "McJannet", or
+"Hamon").}
 
 \item{loc}{a list with location information that includes:
 \itemize{
@@ -56,8 +57,8 @@ evaporation(
 \item "z0" - aerodynamic roughness of weather measurement site (m)
 }}
 
-\item{lake}{A list with lake data. Defaults to NULL, but for lake evaporation
-            calculations, should include:
+\item{lake}{A list with lake data. Defaults to NULL, but for McJannet lake
+            evaporation calculations, should include:
 \itemize{
   \item "A" - surface area of the lake (km^2).
   \item "depth_m" - depth of the lake (m). Can be a static value or vector
@@ -90,11 +91,24 @@ Calculates evaporation (mm/day given daily or monthly inputs, or mm/hour
 given hourly inputs) using specified method. Options include:
 \enumerate{
   \item "FAO" - FAO Penman-Montieth reference evapotranspiration (potential
-             evaporation for a reference grass crop) based on Allen et al.
-             (1998)
+                evaporation for a reference grass crop) based on Allen et al.
+                (1998) for hourly, daily, or monthly timestep.
   \item "McJannet" - Daily lake evaporation based on the method in McJannet et al.
-                  (2008) as presented in McMahon et al. (2013)
+                     (2008) as presented in McMahon et al. (2013)
+  \item "Hamon" - Daily lake evaporation based on the unmodified Hamon method
+                  as presented in Harwell (2012)
 }
+}
+\details{
+When assessing which parameters are required for a given method, use the
+following guidelines:
+\itemize{
+\item "loc" - FAO (all), McJanet (all), Hamond (only "phi")
+\item "weather" - FAO (all but "z0"), McJanet (all), Hamond (only "datetimes"
+                  and "atmp" list with min and max daily atmp)
+\item "lake" - FAO (not required, use default NULL value), McJanet (all but
+               "lst"), Hamond (not required, use default NULL value).
+ }
 }
 \references{
 Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
@@ -112,4 +126,10 @@ McMahon, T. A., Peel, M. C., Lowe, L., Srikanthan, R., and
   evaporation using standard meteorological data: a pragmatic synthesis,
   Hydrol. Earth Syst. Sci., 17, 1331–1363.
   https://doi.org/10.5194/hess-17-1331-2013.
+
+Harwell, G.R., 2012, Estimation of evaporation from open water—A
+  review of selected studies, summary of U.S. Army Corps of Engineers data
+  collection and methods, and evaluation of two methods for estimation of
+  evaporation from five reservoirs in Texas: U.S. Geological Survey
+  Scientific Investigations Report 2012–5202, 96 p.
 }

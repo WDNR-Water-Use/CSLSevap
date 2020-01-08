@@ -14,11 +14,18 @@
 #' Vapour pressure, saturation
 #'
 #' Calculates the saturation vapour pressure at a given temperature based on
-#' equation 11 of Allen et al. (1998).
+#' equation 11 of Allen et al. (1998). Identical to Equation 2.4 in Harwell
+#' (2012).
 #'
 #' @references Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
 #'   evapotranspiration: Guidelines for computing crop water requirements. Rome:
 #'   FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
+#'
+#' @references Harwell, G.R., 2012, Estimation of evaporation from open water—A
+#'   review of selected studies, summary of U.S. Army Corps of Engineers data
+#'   collection and methods, and evaluation of two methods for estimation of
+#'   evaporation from five reservoirs in Texas: U.S. Geological Survey
+#'   Scientific Investigations Report 2012–5202, 96 p.
 #'
 #' @param tmp temperature of air or water (degrees C), vector or atomic number.
 #'
@@ -154,6 +161,39 @@ vp_sat_curve_slope <- function(atmp) {
   Delta <- (4098*(vp_sat(atmp)))/
            ((atmp + 237.3)^2)
   return(Delta)
+}
+
+# ------------------------------------------------------------------------------
+#' Saturation vapor density
+#'
+#' Calculates the saturation vapor density from the ideal gas law based on
+#' Equation 2.6 in Harwell (2012).
+#'
+#' @references Harwell, G.R., 2012, Estimation of evaporation from open water—A
+#'   review of selected studies, summary of U.S. Army Corps of Engineers data
+#'   collection and methods, and evaluation of two methods for estimation of
+#'   evaporation from five reservoirs in Texas: U.S. Geological Survey
+#'   Scientific Investigations Report 2012–5202, 96 p.
+#'
+#' @param atmp air temperature (degrees C). When dt is "daily" or larger,
+#'             argument should be a list with elements "min" and "max" for daily
+#'             min and max temperatures. When dt is "hourly", argument should be
+#'             a vector with hourly recorded temperatures.
+#'
+#' @return \item{svd}{saturated vapor density (g/m^3)}
+#'
+#' @importFrom NISTunits NISTdegCtOk
+#'
+#' @export
+
+sat_vapor_density <- function(atmp) {
+  es  <- vp_sat_mean(atmp)
+  if (class(atmp) == "list"){
+    atmp <- (atmp$min + atmp$max)/2
+  }
+  atmp_K <- NISTdegCtOk(atmp)
+  svd <- 2166.74*(es/atmp_K)
+  return(svd)
 }
 
 # ------------------------------------------------------------------------------

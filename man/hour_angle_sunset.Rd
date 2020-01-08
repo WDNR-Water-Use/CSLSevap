@@ -17,10 +17,17 @@ hemisphere, negative for southern hemisphere.}
 }
 \description{
 Calculates the sunset hour angle (radians) for a given location and day of
-the year using Equation 25 from Allen et al. (1998).
+the year using Equation 25 from Allen et al. (1998). Identical to Equation
+2.2 in Harwell (2012).
 }
 \references{
 Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
   evapotranspiration: Guidelines for computing crop water requirements. Rome:
   FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
+
+Harwell, G.R., 2012, Estimation of evaporation from open water—A
+  review of selected studies, summary of U.S. Army Corps of Engineers data
+  collection and methods, and evaluation of two methods for estimation of
+  evaporation from five reservoirs in Texas: U.S. Geological Survey
+  Scientific Investigations Report 2012–5202, 96 p.
 }
