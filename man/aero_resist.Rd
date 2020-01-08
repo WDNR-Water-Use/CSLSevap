@@ -2,12 +2,12 @@
 % Please edit documentation in R/wind_functions.R
 \name{aero_resist}
 \alias{aero_resist}
-\title{Aerodynamic Resistance}
+\title{Aerodynamic resistance}
 \usage{
 aero_resist(uz, wind_z, z0, A, lake_z, rho_a = 1.2, ca = 0.001013)
 }
 \arguments{
-\item{uz}{wind speed at zm height (m/s)}
+\item{uz}{wind speed at wind_z height (m/s)}
 
 \item{wind_z}{height at which uz is measured (m)}
 
@@ -25,9 +25,9 @@ aero_resist(uz, wind_z, z0, A, lake_z, rho_a = 1.2, ca = 0.001013)
 \item{ra}{aerodynamic resistance (s/m)}
 }
 \description{
-Calculates the aerodynamic resistance (s/m) as defined by Calder and Neal
-(1984, pg. 93) and McJannet et al. (2008, Appendix B, Equation 10), and as
-presented in McMahon et al. (2013) Equation S11.23.
+Calculates the aerodynamic resistance (s/m) over a lake as defined by Calder
+and Neal (1984, pg. 93) and McJannet et al. (2008, Appendix B, Equation 10),
+and as presented in McMahon et al. (2013) Equation S11.23.
 }
 \references{
 McMahon, T. A., Peel, M. C., Lowe, L., Srikanthan, R., and
@@ -35,4 +35,10 @@ McMahon, T. A., Peel, M. C., Lowe, L., Srikanthan, R., and
   evaporation using standard meteorological data: a pragmatic synthesis,
   Hydrol. Earth Syst. Sci., 17, 1331–1363.
   https://doi.org/10.5194/hess-17-1331-2013.
+
+McJannet, D. L., Webster, I. T., Stenson, M. P., and Sherman,
+  B.S. (2008). Estimating open water evaporation for the Murray-Darling
+  Basin. A report to the Australian Government from the CSIRO Murray-Darling
+  Basin Sustainable Yields Project, CSIRO, Australia, 50 pp. Retrieved from
+  http://www.clw.csiro.au/publications/waterforahealthycountry/mdbsy/technical/U-OpenWaterEvaporation.pdf.
 }

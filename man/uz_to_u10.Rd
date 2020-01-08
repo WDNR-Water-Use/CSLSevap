@@ -2,7 +2,7 @@
 % Please edit documentation in R/wind_functions.R
 \name{uz_to_u10}
 \alias{uz_to_u10}
-\title{Wind Speed at 10m Height}
+\title{Wind speed at 10m height}
 \usage{
 uz_to_u10(uz, z = 2, z0 = 0.02)
 }
@@ -19,7 +19,7 @@ for a short grass.}
 \item{u10}{wind speed at 10 m above ground surface (m/s)}
 }
 \description{
-Calculates the wind speed at 10m height given a wind speed at zm height based
+Calculates the wind speed at 10 m height given a wind speed at z m height based
 on Equation S4.4 in McMahon et al. (2013).
 }
 \references{

@@ -2,7 +2,7 @@
 % Please edit documentation in R/vapour_functions.R
 \name{tmp_dew}
 \alias{tmp_dew}
-\title{Dew Point Temperature}
+\title{Temperature, dew point}
 \usage{
 tmp_dew(atmp, RH)
 }
@@ -31,4 +31,10 @@ McMahon, T. A., Peel, M. C., Lowe, L., Srikanthan, R., and
   evaporation using standard meteorological data: a pragmatic synthesis,
   Hydrol. Earth Syst. Sci., 17, 1331–1363.
   https://doi.org/10.5194/hess-17-1331-2013.
+
+McJannet, D. L., Webster, I. T., Stenson, M. P., and Sherman,
+  B.S. (2008). Estimating open water evaporation for the Murray-Darling
+  Basin. A report to the Australian Government from the CSIRO Murray-Darling
+  Basin Sustainable Yields Project, CSIRO, Australia, 50 pp. Retrieved from
+  http://www.clw.csiro.au/publications/waterforahealthycountry/mdbsy/technical/U-OpenWaterEvaporation.pdf.
 }

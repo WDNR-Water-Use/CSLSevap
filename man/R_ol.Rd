@@ -2,7 +2,7 @@
 % Please edit documentation in R/radiation_functions.R
 \name{R_ol}
 \alias{R_ol}
-\title{Outgoing Longwave Radiation at Wet Bulb Temperature}
+\title{Radiation, outgoing longwave}
 \usage{
 R_ol(type = "McJannet", tmp1, tmp2 = NULL, SBc = 4.903e-09)
 }
@@ -25,7 +25,7 @@ temperatures.}
 MJ/m^2/day.}
 }
 \value{
-{Rol}{outgoing longwave radiation (MJ/m^2/day)}
+\item{Rol}{outgoing longwave radiation (MJ/m^2/day)}
 }
 \description{
 Calculates the outgoing longwave radiation for a lake as a function of lake

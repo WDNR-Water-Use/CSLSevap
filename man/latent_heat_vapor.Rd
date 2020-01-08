@@ -2,7 +2,7 @@
 % Please edit documentation in R/vapour_functions.R
 \name{latent_heat_vapor}
 \alias{latent_heat_vapor}
-\title{Latent Heat of Vaporization}
+\title{Latent heat of vaporization}
 \usage{
 latent_heat_vapor(atmp)
 }

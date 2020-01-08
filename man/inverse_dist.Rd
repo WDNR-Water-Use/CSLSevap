@@ -2,7 +2,7 @@
 % Please edit documentation in R/radiation_functions.R
 \name{inverse_dist}
 \alias{inverse_dist}
-\title{Inverse Relative Distance Earth-Sun}
+\title{Inverse relative distance Earth-Sun}
 \usage{
 inverse_dist(J)
 }

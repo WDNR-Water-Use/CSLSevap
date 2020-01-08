@@ -2,7 +2,7 @@
 % Please edit documentation in R/radiation_functions.R
 \name{R_il}
 \alias{R_il}
-\title{Incoming Longwave Radiation}
+\title{Radiation, incoming longwave}
 \usage{
 R_il(Cf, atmp, SBc = 4.903e-09)
 }
@@ -18,7 +18,7 @@ a vector with hourly recorded temperatures.}
 MJ/m^2/day.}
 }
 \value{
-{Cf}{the fraction of cloud cover (-)}
+\item{Cf}{the fraction of cloud cover (-)}
 }
 \description{
 Calculates the incoming longwave radiation using cloud cover fraction and

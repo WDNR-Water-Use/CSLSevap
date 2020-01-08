@@ -2,7 +2,7 @@
 % Please edit documentation in R/vapour_functions.R
 \name{vp_deficit}
 \alias{vp_deficit}
-\title{Vapour Pressure Deficit}
+\title{Vapour pressure deficit}
 \usage{
 vp_deficit(atmp, RH)
 }
@@ -21,10 +21,11 @@ vector with hourly recorded relative humidities.}
 \item{vpd}{vapour pressure deficit (kPa) for the given time period}
 }
 \description{
-Calculates the vapour pressure deficit for a given time period (daily timestep
-or larger) using the mean daily minimum temperature, mean daily maximum
-temperature, mean daily minimum relative humidity, and mean daily maxiumum
-humidity during that time period. See p.39 in Allen et al. (1998).
+Calculates the vapour pressure deficit for a given time period (daily
+timestep or larger) using the mean daily minimum temperature, mean daily
+maximum temperature, mean daily minimum relative humidity, and mean daily
+maxiumum humidity during that time period. See p.39 and p.74 in Allen et al.
+(1998).
 }
 \references{
 Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop

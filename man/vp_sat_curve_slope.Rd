@@ -2,7 +2,7 @@
 % Please edit documentation in R/vapour_functions.R
 \name{vp_sat_curve_slope}
 \alias{vp_sat_curve_slope}
-\title{Slope of Saturation Vapour Pressure Curve}
+\title{Slope of saturation vapour pressure curve}
 \usage{
 vp_sat_curve_slope(atmp)
 }

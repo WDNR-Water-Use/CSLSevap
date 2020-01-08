@@ -2,7 +2,7 @@
 % Please edit documentation in R/vapour_functions.R
 \name{vp_sat_mean}
 \alias{vp_sat_mean}
-\title{Mean Saturation Vapour Pressure}
+\title{Vapour pressure, mean saturated}
 \usage{
 vp_sat_mean(atmp)
 }
@@ -18,8 +18,7 @@ a vector with hourly recorded temperatures.}
 }
 \description{
 Calculates the mean saturation vapour pressure for an hourly, daily, or
-larger time period based on Equation 12 (for daily or larger timestep) on pg.
-36 of Allen et al. (1998).
+larger time period based on Equations 11 and 12 of Allen et al. (1998).
 }
 \references{
 Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop

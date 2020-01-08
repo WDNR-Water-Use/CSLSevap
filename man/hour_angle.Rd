@@ -2,22 +2,22 @@
 % Please edit documentation in R/radiation_functions.R
 \name{hour_angle}
 \alias{hour_angle}
-\title{Solar Time Angle}
+\title{Solar time angle}
 \usage{
 hour_angle(tmid, tL, Lm, Lz)
 }
 \arguments{
 \item{tmid}{date and time of the midpoint of the time period [POSIXct].}
 
-\item{tL}{length of the time period, from lubridate "interval_len".}
+\item{tL}{length of the time period, from lubridate function "interval_len".}
 
-\item{Lm}{longitude of the measurement site (degrees west of Greenwich)}
+\item{Lm}{longitude of the measurement site (degrees west of Greenwich).}
 
-\item{Lz}{longitude of the center of the local time zone (degrees west of
-Greenwich). For example, Lz = 75, 90, 105 and 120° for the Eastern,
-Central, Rocky Mountain and Pacific time zones (United States) and
-Lz = 0° for Greenwich, 330° for Cairo (Egypt), and 255° for Bangkok
-(Thailand).}
+\item{Lz}{longitude of the center of the time zone used for measurements
+(degrees west of Greenwich). For example, Lz = 75, 90, 105 and 120°
+for the Eastern, Central, Rocky Mountain and Pacific time zones
+(United States) and Lz = 0° for Greenwich, 330° for Cairo (Egypt),
+and 255° for Bangkok (Thailand).}
 }
 \value{
 \item{omega1}{solar time angle at the beginning of the period (radians)}

@@ -14,7 +14,7 @@
 # - cloud_factor
 
 # ------------------------------------------------------------------------------
-#' Net Solar or Shortwave Radiation
+#' Radiation, net
 #'
 #' Calculates the net solar or shortwave radiation using the "FAO" Penman
 #' Monteith approach for reference evapotranspiration (Allen et al., 1998,
@@ -36,9 +36,6 @@
 #'              Penman-Monteith reference evapotranspiration. Other options
 #'              include "McJannet" for net radiation at lake temperature and
 #'              "wet_bulb" for net radiation at wet-bulb temperature.
-#' @param Gsc solar constant (MJ/m^2/min). Defaults to 0.0820 MJ/m^2/min.
-#' @param SBc Stefan-Boltzman constant (MJ/m^2/day). Defaults to 4.903e-9
-#'            MJ/m^2/day.
 #' @inheritParams evaporation
 #'
 #' @return \item{Rn}{net radiation (MJ/m^2/timestep)}
@@ -46,7 +43,11 @@
 #' @export
 R_n <- function(type = "FAO", loc, lake, weather, albedo){
   # Shortwave
-  Rns  <- R_ns(weather$Rs, albedo)
+  if (type == "FAO"){
+    Rns  <- R_ns(weather$Rs, albedo$ref_crop)
+  } else {
+    Rns  <- R_ns(weather$Rs, albedo$water)
+  }
 
   # Longwave
   Ra   <- R_a(weather$dt, weather$datetimes, loc$phi, loc$Lm, loc$Lz)
@@ -77,7 +78,7 @@ R_n <- function(type = "FAO", loc, lake, weather, albedo){
 }
 
 # ------------------------------------------------------------------------------
-#' Net Solar or Shortwave Radiation
+#' Radiation, net solar/shortwave
 #'
 #' Calculates the net solar or shortwave radiation for a given location based on
 #' incoming solar radiation timeseries. Based on Equation 38 in Allen et al.
@@ -100,7 +101,7 @@ R_ns <- function(Rs, albedo = 0.23){
 }
 
 # ------------------------------------------------------------------------------
-#' Net Longwave Radiation
+#' Radiation, net longwave
 #'
 #' Calculates the net outgoing longwave radiation for a given location based on
 #' incoming solar radiation, incoming clear-sky radiation, and air temperature
@@ -144,7 +145,7 @@ R_nl <- function(dt, Rs, Rso, ea, atmp, SBc = 4.903e-9){
 }
 
 # ------------------------------------------------------------------------------
-#' Clear-Sky Solar Radiation
+#' Radiation, clear-sky solar
 #'
 #' Calculates the clear-sky solar radiation based on Equation 37 in Allen et al.
 #' (1998).
@@ -165,10 +166,9 @@ R_so <- function(Ra, z){
 }
 
 # ------------------------------------------------------------------------------
-#' Extraterrestrial Solar Radiation
+#' Radiation, extraterrestrial solar
 #'
 #' Calculates the extraterrestrial radiation for a given location and timestep.
-#'
 #' For daily periods, uses Equation 21 from Allen et al. (1998). For hourly or
 #' shorter periods, uses Equation 28 from Allen et al. (1998).
 #'
@@ -182,14 +182,11 @@ R_so <- function(Ra, z){
 #' @param phi latitude of the location (radians). Positive for northern
 #'            hemisphere, negative for southern hemisphere.
 #' @param Lm longitude of the measurement site (degrees west of Greenwich).
-#'           Defaults to NULL since is not needed for daily timesteps.
-#' @param Lz longitude of the center of the local time zone (degrees west of
-#'            Greenwich). For example, Lz = 75, 90, 105 and 120° for the
-#'            Eastern, Central, Rocky Mountain and Pacific time zones (United
-#'            States) and Lz = 0° for Greenwich, 330° for Cairo (Egypt), and
-#'            255° for Bangkok (Thailand). Defaults to 90 for Wisconsin (US
-#'            Central Time Zone). Defaults to NULL since is not needed for daily
-#'            timesteps.
+#' @param Lz longitude of the center of the time zone used for measurements
+#'           (degrees west of Greenwich). For example, Lz = 75, 90, 105 and 120°
+#'           for the Eastern, Central, Rocky Mountain and Pacific time zones
+#'           (United States) and Lz = 0° for Greenwich, 330° for Cairo (Egypt),
+#'           and 255° for Bangkok (Thailand).
 #' @param Gsc solar constant (MJ/m^2/min). Defaults to 0.0820 MJ/m^2/min.
 #'
 #' @return \item{Ra}{extraterrestrial radiation (MJ/m^2/day) or (MJ/m^2/hour),
@@ -248,7 +245,7 @@ R_a <- function(dt, datetimes, phi, Lm, Lz, Gsc = 0.0820){
 }
 
 # ------------------------------------------------------------------------------
-#' Inverse Relative Distance Earth-Sun
+#' Inverse relative distance Earth-Sun
 #'
 #' Calculates the inverse relative distance Earth-Sun using Equation 23 from
 #' Allen et al. (1998).
@@ -269,7 +266,7 @@ inverse_dist <- function(J) {
 }
 
 # ------------------------------------------------------------------------------
-#' Solar Declination
+#' Solar declination
 #'
 #' Calculates the solar declination (radians) using Equation 24 from Allen et
 #' al. (1998).
@@ -290,7 +287,7 @@ declination <- function(J) {
 }
 
 # ------------------------------------------------------------------------------
-#' Sunset Hour Angle
+#' Sunset hour angle
 #'
 #' Calculates the sunset hour angle (radians) for a given location and day of
 #' the year using Equation 25 from Allen et al. (1998).
@@ -299,8 +296,7 @@ declination <- function(J) {
 #'   evapotranspiration: Guidelines for computing crop water requirements. Rome:
 #'   FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
 #'
-#' @param phi the latitude of the location (radians). Positive for northern
-#'            hemisphere, negative for southern hemisphere.
+#' @inheritParams R_a
 #' @param delta the solar declination based on the Julian day (radians)
 #'
 #' @return \item{omega_s}{sunset hour angle (radians)}
@@ -312,7 +308,7 @@ hour_angle_sunset <- function(phi, delta) {
 }
 
 # ------------------------------------------------------------------------------
-#' Solar Time Angle
+#' Solar time angle
 #'
 #' Calculates the beginning, midpoint, and end solar time angle (radians) for a
 #' given location and day of the year using Equations 29-33 from Allen et al.
@@ -323,13 +319,8 @@ hour_angle_sunset <- function(phi, delta) {
 #'   FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
 #'
 #' @param tmid date and time of the midpoint of the time period [POSIXct].
-#' @param tL length of the time period, from lubridate "interval_len".
-#' @param Lm longitude of the measurement site (degrees west of Greenwich)
-#' @param Lz longitude of the center of the local time zone (degrees west of
-#'           Greenwich). For example, Lz = 75, 90, 105 and 120° for the Eastern,
-#'           Central, Rocky Mountain and Pacific time zones (United States) and
-#'           Lz = 0° for Greenwich, 330° for Cairo (Egypt), and 255° for Bangkok
-#'           (Thailand).
+#' @param tL length of the time period, from lubridate function "interval_len".
+#' @inheritParams R_a
 #'
 #' @return
 #' \item{omega1}{solar time angle at the beginning of the period (radians)}
@@ -355,7 +346,7 @@ hour_angle <- function(tmid, tL, Lm, Lz) {
 }
 
 # ------------------------------------------------------------------------------
-#' Outgoing Longwave Radiation at Wet Bulb Temperature
+#' Radiation, outgoing longwave
 #'
 #' Calculates the outgoing longwave radiation for a lake as a function of lake
 #' temperature ("McJannet"; McMahon et al., 2013, Equation S11.27) or as a
@@ -382,7 +373,7 @@ hour_angle <- function(tmid, tL, Lm, Lz) {
 #' @param SBc Stefan-Boltzman constant (MJ/m^2/day). Defaults to 4.903e-9
 #'            MJ/m^2/day.
 #'
-#' @return {Rol}{outgoing longwave radiation (MJ/m^2/day)}
+#' @return \item{Rol}{outgoing longwave radiation (MJ/m^2/day)}
 #'
 #' @export
 R_ol <- function(type = "McJannet", tmp1, tmp2 = NULL, SBc = 4.903e-9) {
@@ -398,7 +389,7 @@ R_ol <- function(type = "McJannet", tmp1, tmp2 = NULL, SBc = 4.903e-9) {
 }
 
 # ------------------------------------------------------------------------------
-#' Incoming Longwave Radiation
+#' Radiation, incoming longwave
 #'
 #' Calculates the incoming longwave radiation using cloud cover fraction and
 #' mean daily air temperature based on McMahon et al. (2013) Equation S11.27.
@@ -417,7 +408,7 @@ R_ol <- function(type = "McJannet", tmp1, tmp2 = NULL, SBc = 4.903e-9) {
 #' @param SBc Stefan-Boltzman constant (MJ/m^2/day). Defaults to 4.903e-9
 #'            MJ/m^2/day.
 #'
-#' @return {Cf}{the fraction of cloud cover (-)}
+#' @return \item{Cf}{the fraction of cloud cover (-)}
 #'
 #' @export
 R_il <- function(Cf, atmp, SBc = 4.903e-9) {
@@ -427,22 +418,28 @@ R_il <- function(Cf, atmp, SBc = 4.903e-9) {
 }
 
 # ------------------------------------------------------------------------------
-#' Cloudiness Factor
+#' Cloudiness factor
 #'
 #' Estimates the fraction of cloud cover based on McJannet et al. (2008b,
 #' Equations 14 and 15), as presented by McMahon et al. (2013), Equations S3.17
 #' and S3.18.
 #'
 #' @references McMahon, T. A., Peel, M. C., Lowe, L., Srikanthan, R., and
-#'   McVicar, T. R.: Estimating actual, potential, reference crop and pan
+#'   McVicar, T. R. (2013). Estimating actual, potential, reference crop and pan
 #'   evaporation using standard meteorological data: a pragmatic synthesis,
-#'   Hydrol. Earth Syst. Sci., 17, 1331–1363,
-#'   https://doi.org/10.5194/hess-17-1331-2013, 2013.
+#'   Hydrol. Earth Syst. Sci., 17, 1331–1363.
+#'   https://doi.org/10.5194/hess-17-1331-2013.
+#'
+#' @references McJannet, D. L., Webster, I. T., Stenson, M. P., and Sherman,
+#'   B.S. (2008). Estimating open water evaporation for the Murray-Darling
+#'   Basin. A report to the Australian Government from the CSIRO Murray-Darling
+#'   Basin Sustainable Yields Project, CSIRO, Australia, 50 pp. Retrieved from
+#'   http://www.clw.csiro.au/publications/waterforahealthycountry/mdbsy/technical/U-OpenWaterEvaporation.pdf.
 #'
 #' @param Rs incoming solar radiation (MJ/m^2/day)
 #' @param Rso clear sky radiation (MJ/m^2/day).
 #'
-#' @return {Cf}{the fraction of cloud cover (-)}
+#' @return \item{Cf}{the fraction of cloud cover (-)}
 #'
 #' @export
 cloud_factor <- function(Rs, Rso) {

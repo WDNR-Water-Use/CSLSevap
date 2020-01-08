@@ -2,10 +2,15 @@
 % Please edit documentation in R/vapour_functions.R
 \name{psychrometric_constant}
 \alias{psychrometric_constant}
-\title{Psychrometric Constant}
+\title{Psychrometric constant}
 \usage{
-psychrometric_constant(z, atmp = NULL, lambda = 2.45, cp = 0.001013,
-  epsilon = 0.622)
+psychrometric_constant(
+  z,
+  atmp = NULL,
+  lambda = 2.45,
+  cp = 0.001013,
+  epsilon = 0.622
+)
 }
 \arguments{
 \item{z}{elevation above sea level (m)}

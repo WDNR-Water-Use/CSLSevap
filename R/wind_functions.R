@@ -6,10 +6,10 @@
 # - aero_resist
 
 # ------------------------------------------------------------------------------
-#' Wind Speed at 2m Height
+#' Wind speed at 2m height
 #'
-#' Calculates the wind speed at 2m height given a wind speed at zm height based
-#' on Equation 47 in Allen et al. (1998).
+#' Calculates the wind speed at 2 m height given a wind speed at z m height
+#' based on Equation 47 in Allen et al. (1998).
 #'
 #' @references Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
 #'   evapotranspiration: Guidelines for computing crop water requirements. Rome:
@@ -29,9 +29,9 @@ u2_fcn <- function(uz, z = 10) {
 }
 
 # ------------------------------------------------------------------------------
-#' Wind Speed at 10m Height
+#' Wind speed at 10m height
 #'
-#' Calculates the wind speed at 10m height given a wind speed at zm height based
+#' Calculates the wind speed at 10 m height given a wind speed at z m height based
 #' on Equation S4.4 in McMahon et al. (2013).
 #'
 #' @references McMahon, T. A., Peel, M. C., Lowe, L., Srikanthan, R., and
@@ -56,7 +56,7 @@ uz_to_u10 <- function(uz, z = 2, z0 = 0.02) {
 }
 
 # ------------------------------------------------------------------------------
-#' Wind Function for Lakes
+#' Wind function for lakes
 #'
 #' Calculates the wind function given the wind speed at 10m and the surface area
 #' of the lake, based on McJannet et al. (2008) Appendix B, Equation 10, as
@@ -68,10 +68,16 @@ uz_to_u10 <- function(uz, z = 2, z0 = 0.02) {
 #'   Hydrol. Earth Syst. Sci., 17, 1331–1363.
 #'   https://doi.org/10.5194/hess-17-1331-2013.
 #'
+#' @references McJannet, D. L., Webster, I. T., Stenson, M. P., and Sherman,
+#'   B.S. (2008). Estimating open water evaporation for the Murray-Darling
+#'   Basin. A report to the Australian Government from the CSIRO Murray-Darling
+#'   Basin Sustainable Yields Project, CSIRO, Australia, 50 pp. Retrieved from
+#'   http://www.clw.csiro.au/publications/waterforahealthycountry/mdbsy/technical/U-OpenWaterEvaporation.pdf.
+#'
 #' @param u10 wind speed at 10 m above ground surface (m/s)
 #' @param A area of the water body (km^2)
 #'
-#' @return \item{ufcn}{wind function from McJannet}
+#' @return \item{ufcn}{wind function from McJannet et al., 2008}
 #'
 #' @export
 
@@ -81,11 +87,11 @@ u_fcn <- function(u10, A) {
 }
 
 # ------------------------------------------------------------------------------
-#' Aerodynamic Resistance
+#' Aerodynamic resistance
 #'
-#' Calculates the aerodynamic resistance (s/m) as defined by Calder and Neal
-#' (1984, pg. 93) and McJannet et al. (2008, Appendix B, Equation 10), and as
-#' presented in McMahon et al. (2013) Equation S11.23.
+#' Calculates the aerodynamic resistance (s/m) over a lake as defined by Calder
+#' and Neal (1984, pg. 93) and McJannet et al. (2008, Appendix B, Equation 10),
+#' and as presented in McMahon et al. (2013) Equation S11.23.
 #'
 #' @references McMahon, T. A., Peel, M. C., Lowe, L., Srikanthan, R., and
 #'   McVicar, T. R. (2013). Estimating actual, potential, reference crop and pan
@@ -93,7 +99,13 @@ u_fcn <- function(u10, A) {
 #'   Hydrol. Earth Syst. Sci., 17, 1331–1363.
 #'   https://doi.org/10.5194/hess-17-1331-2013.
 #'
-#' @param uz wind speed at zm height (m/s)
+#' @references McJannet, D. L., Webster, I. T., Stenson, M. P., and Sherman,
+#'   B.S. (2008). Estimating open water evaporation for the Murray-Darling
+#'   Basin. A report to the Australian Government from the CSIRO Murray-Darling
+#'   Basin Sustainable Yields Project, CSIRO, Australia, 50 pp. Retrieved from
+#'   http://www.clw.csiro.au/publications/waterforahealthycountry/mdbsy/technical/U-OpenWaterEvaporation.pdf.
+#'
+#' @param uz wind speed at wind_z height (m/s)
 #' @param wind_z height at which uz is measured (m)
 #' @param z0 aerodynamic roughness of land cover at measurement site (m)
 #' @param A surface area of the lake (km^2)

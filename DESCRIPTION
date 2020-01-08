@@ -1,11 +1,11 @@
 Package: CSLSevap
 Type: Package
 Title: Evapo(transpi)ration Calculations
-Version: 0.1.0
+Version: 1.0.0
 Author: Carolyn Voter <cvoter@wisc.edu>
 Maintainer: Carolyn Voter <cvoter@wisc.edu>
 Description: Multiple ways of calculating evapo(transpi)ration.
-    Includes Penman-Monteith RET and lake evaporation (McJannet method).
+    Includes FAO Penman-Monteith RET and lake evaporation (McJannet method).
 Imports:
   lubridate,
 	rlang,
@@ -18,4 +18,4 @@ Suggests:
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2

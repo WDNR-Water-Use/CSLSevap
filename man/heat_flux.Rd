@@ -2,12 +2,81 @@
 % Please edit documentation in R/heat_functions.R
 \name{heat_flux}
 \alias{heat_flux}
-\title{Heat Flux}
+\title{Heat flux}
 \usage{
-heat_flux(method, loc, lake, weather, Rn = NULL, rho_w = 997.9,
-  cw = 0.00419)
+heat_flux(
+  method,
+  loc,
+  lake,
+  weather,
+  albedo,
+  Rn = NULL,
+  rho_w = 997.9,
+  cw = 0.00419
+)
 }
 \arguments{
+\item{method}{denotes which evaporation method to use ("FAO" or "McJannet").}
+
+\item{loc}{a list with location information that includes:
+\itemize{
+\item "z" - elevation above mean sea level (m)
+\item"phi" - latitude of location (radians). Positive for northern
+             hemisphere, negative for southern hemisphere.
+\item"Lm" - longitude of location (degrees west of Greenwich).
+\item"Lz" - longitude of location's measurement timezone (degrees west of
+            Greenwich). For example, Lz = 75, 90, 105 and 120° for
+            measurement times based on the Eastern, Central, Rocky Mountain
+            and Pacific time zones (United States) and Lz = 0° for Greenwich,
+            330° for Cairo (Egypt), and 255° for Bangkok (Thailand).
+}}
+
+\item{lake}{A list with lake data. Defaults to NULL, but for lake evaporation
+            calculations, should include:
+\itemize{
+  \item "A" - surface area of the lake (km^2).
+  \item "depth_m" - depth of the lake (m). Can be a static value or vector
+                    corresponding with datetimes vector.
+  \item "lst" - optional data frame with date (datetime) and ltmp (lake
+                temperature, degC).
+  \item "wtmp0" - required initial water temperature for first day in
+                  datetimes (degC).
+
+}}
+
+\item{weather}{a list with weather data that includes:
+\itemize{
+\item "dt" - string indicating the timestep of input weather series. Expects
+             "hourly", "daily", or "monthly".
+\item "datetimes" - datetimes of weather records [POSIXct]. If monthly
+                    timestep, make sure date is the 15th of each month.
+\item "atmp" - If hourly timestep, vector of air temperature (degrees C)
+               corresponding with datetimes vector. If daily or monthly
+               timestep, list with two vectors, "min" and "max", with mean
+               daily min and max air temperature (degrees C) corresponding
+               with datetimes vector
+\item "RH" - If hourly timestep, vector of relative humidity (percent)
+             corresponding with datetimes vector. If daily or monthly
+             timestep, list with two vectors, "min" and "max", with mean
+             daily min and max relative humidity (percent) corresponding with
+             datetimes vector.
+\item "Rs" - vector of incoming solar or shortwave radiation (MJ/m^2/hr if
+             hourly timestep, MG/m^2/day if daily or monthly), corresponding
+             with datetimes vector.
+\item "wind" - vector with mean wind speed (m/s), corresponding with
+               datetimes vector.
+\item "wind_elev" - atomic number, height at which wind is measured (m)
+\item "z0" - aerodynamic roughness of weather measurement site (m)
+}}
+
+\item{albedo}{a list with albedos for different surfaces, defaults to:
+\itemize{
+  \item "ref_crop" - albedo of the hypothetical grass reference crop, 0.23
+  \item "water" - albedo of water, 0.08.
+}}
+
+\item{Rn}{Net solar or shortwave radiation (MJ/m^2/timestep)}
+
 \item{rho_w}{density of water (kg/m^3), defaults to 997.9 kg/m^3 at 20 deg C}
 
 \item{cw}{specific heat of water (MJ/kg/K), defaults to 0.00419}
@@ -16,13 +85,12 @@ heat_flux(method, loc, lake, weather, Rn = NULL, rho_w = 997.9,
 \item{G}{heat flux (MJ/m^2/hr)}
 }
 \description{
-Calculates soil heat flux for hourly, daily, or monthly calculations beneath a
-dense cover of grass. Based on Equations 42-46 in Allen et al. (1998).
-}
-\details{
-Calculates the change in heat storage based on water temperature following
-McJannet et al. (2008) Equation 31 as presented in McMahon et al. S11.33
-(2013).
+Calculates the heat flux for the land surface in question. When using the
+"FAO" evaporation method, calculates the soil heat flux beneath a dense cover
+of grass based on Equations 42-46 in Allen et al. (1998). When using the
+"McJannet" lake evaporation method, calculates the change in heat storage
+based on water temperature following McJannet et al. (2008) Equation 31 as
+presented in McMahon et al. S11.33 (2013).
 }
 \references{
 Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
@@ -30,8 +98,14 @@ Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
   FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
 
 McMahon, T. A., Peel, M. C., Lowe, L., Srikanthan, R., and
-  McVicar, T. R.: Estimating actual, potential, reference crop and pan
+  McVicar, T. R. (2013). Estimating actual, potential, reference crop and pan
   evaporation using standard meteorological data: a pragmatic synthesis,
-  Hydrol. Earth Syst. Sci., 17, 1331–1363,
-  https://doi.org/10.5194/hess-17-1331-2013, 2013.
+  Hydrol. Earth Syst. Sci., 17, 1331–1363.
+  https://doi.org/10.5194/hess-17-1331-2013.
+
+McJannet, D. L., Webster, I. T., Stenson, M. P., and Sherman,
+  B.S. (2008). Estimating open water evaporation for the Murray-Darling
+  Basin. A report to the Australian Government from the CSIRO Murray-Darling
+  Basin Sustainable Yields Project, CSIRO, Australia, 50 pp. Retrieved from
+  http://www.clw.csiro.au/publications/waterforahealthycountry/mdbsy/technical/U-OpenWaterEvaporation.pdf.
 }

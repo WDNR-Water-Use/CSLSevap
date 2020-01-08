@@ -2,12 +2,12 @@
 % Please edit documentation in R/radiation_functions.R
 \name{hour_angle_sunset}
 \alias{hour_angle_sunset}
-\title{Sunset Hour Angle}
+\title{Sunset hour angle}
 \usage{
 hour_angle_sunset(phi, delta)
 }
 \arguments{
-\item{phi}{the latitude of the location (radians). Positive for northern
+\item{phi}{latitude of the location (radians). Positive for northern
 hemisphere, negative for southern hemisphere.}
 
 \item{delta}{the solar declination based on the Julian day (radians)}

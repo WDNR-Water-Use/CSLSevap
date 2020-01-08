@@ -2,7 +2,7 @@
 % Please edit documentation in R/radiation_functions.R
 \name{cloud_factor}
 \alias{cloud_factor}
-\title{Cloudiness Factor}
+\title{Cloudiness factor}
 \usage{
 cloud_factor(Rs, Rso)
 }
@@ -12,7 +12,7 @@ cloud_factor(Rs, Rso)
 \item{Rso}{clear sky radiation (MJ/m^2/day).}
 }
 \value{
-{Cf}{the fraction of cloud cover (-)}
+\item{Cf}{the fraction of cloud cover (-)}
 }
 \description{
 Estimates the fraction of cloud cover based on McJannet et al. (2008b,
@@ -21,8 +21,14 @@ and S3.18.
 }
 \references{
 McMahon, T. A., Peel, M. C., Lowe, L., Srikanthan, R., and
-  McVicar, T. R.: Estimating actual, potential, reference crop and pan
+  McVicar, T. R. (2013). Estimating actual, potential, reference crop and pan
   evaporation using standard meteorological data: a pragmatic synthesis,
-  Hydrol. Earth Syst. Sci., 17, 1331–1363,
-  https://doi.org/10.5194/hess-17-1331-2013, 2013.
+  Hydrol. Earth Syst. Sci., 17, 1331–1363.
+  https://doi.org/10.5194/hess-17-1331-2013.
+
+McJannet, D. L., Webster, I. T., Stenson, M. P., and Sherman,
+  B.S. (2008). Estimating open water evaporation for the Murray-Darling
+  Basin. A report to the Australian Government from the CSIRO Murray-Darling
+  Basin Sustainable Yields Project, CSIRO, Australia, 50 pp. Retrieved from
+  http://www.clw.csiro.au/publications/waterforahealthycountry/mdbsy/technical/U-OpenWaterEvaporation.pdf.
 }

@@ -6,26 +6,33 @@
 # - time_const
 
 # ------------------------------------------------------------------------------
-#' Heat Flux
+#' Heat flux
 #'
-#' Calculates soil heat flux for hourly, daily, or monthly calculations beneath a
-#' dense cover of grass. Based on Equations 42-46 in Allen et al. (1998).
-#'
-#' Calculates the change in heat storage based on water temperature following
-#' McJannet et al. (2008) Equation 31 as presented in McMahon et al. S11.33
-#' (2013).
+#' Calculates the heat flux for the land surface in question. When using the
+#' "FAO" evaporation method, calculates the soil heat flux beneath a dense cover
+#' of grass based on Equations 42-46 in Allen et al. (1998). When using the
+#' "McJannet" lake evaporation method, calculates the change in heat storage
+#' based on water temperature following McJannet et al. (2008) Equation 31 as
+#' presented in McMahon et al. S11.33 (2013).
 #'
 #' @references Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
 #'   evapotranspiration: Guidelines for computing crop water requirements. Rome:
 #'   FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
 #'
 #' @references McMahon, T. A., Peel, M. C., Lowe, L., Srikanthan, R., and
-#'   McVicar, T. R.: Estimating actual, potential, reference crop and pan
+#'   McVicar, T. R. (2013). Estimating actual, potential, reference crop and pan
 #'   evaporation using standard meteorological data: a pragmatic synthesis,
-#'   Hydrol. Earth Syst. Sci., 17, 1331–1363,
-#'   https://doi.org/10.5194/hess-17-1331-2013, 2013.
+#'   Hydrol. Earth Syst. Sci., 17, 1331–1363.
+#'   https://doi.org/10.5194/hess-17-1331-2013.
 #'
-#' @inheritParams evap
+#' @references McJannet, D. L., Webster, I. T., Stenson, M. P., and Sherman,
+#'   B.S. (2008). Estimating open water evaporation for the Murray-Darling
+#'   Basin. A report to the Australian Government from the CSIRO Murray-Darling
+#'   Basin Sustainable Yields Project, CSIRO, Australia, 50 pp. Retrieved from
+#'   http://www.clw.csiro.au/publications/waterforahealthycountry/mdbsy/technical/U-OpenWaterEvaporation.pdf.
+#'
+#' @inheritParams evaporation
+#' @param Rn Net solar or shortwave radiation (MJ/m^2/timestep)
 #' @param rho_w density of water (kg/m^3), defaults to 997.9 kg/m^3 at 20 deg C
 #' @param cw specific heat of water (MJ/kg/K), defaults to 0.00419
 #'
@@ -98,22 +105,31 @@ heat_flux <- function(method, loc, lake, weather, albedo,
 }
 
 # ------------------------------------------------------------------------------
-#' Lake Water Temperature
+#' Temperature, lake water
 #'
 #' Calculates the water temperature based on the water temperature of the
 #' previous day following McJannet et al. (2008) Equation 23 and de Bruin (1982)
-#' Equation 10 as presented in McMahon et al. S11.28 (2013).
+#' Equation 10 as presented in McMahon et al. S11.28 (2013). If measured lake
+#' surface temperatures are provided (in \code{lake$lst}), will force water
+#' temperature to those values on all days with measurements and estimate any
+#' missing values using the McJannet and de Bruin appoach.
 #'
 #' @references McMahon, T. A., Peel, M. C., Lowe, L., Srikanthan, R., and
-#'   McVicar, T. R.: Estimating actual, potential, reference crop and pan
+#'   McVicar, T. R. (2013). Estimating actual, potential, reference crop and pan
 #'   evaporation using standard meteorological data: a pragmatic synthesis,
-#'   Hydrol. Earth Syst. Sci., 17, 1331–1363,
-#'   https://doi.org/10.5194/hess-17-1331-2013, 2013.
+#'   Hydrol. Earth Syst. Sci., 17, 1331–1363.
+#'   https://doi.org/10.5194/hess-17-1331-2013.
+#'
+#' @references McJannet, D. L., Webster, I. T., Stenson, M. P., and Sherman,
+#'   B.S. (2008). Estimating open water evaporation for the Murray-Darling
+#'   Basin. A report to the Australian Government from the CSIRO Murray-Darling
+#'   Basin Sustainable Yields Project, CSIRO, Australia, 50 pp. Retrieved from
+#'   http://www.clw.csiro.au/publications/waterforahealthycountry/mdbsy/technical/U-OpenWaterEvaporation.pdf.
 #'
 #'
-#' @inheritParams lake_evap
+#' @inheritParams evaporation
 #'
-#' @return {wtmp}{water temperature (degrees C)}
+#' @return \item{wtmp}{water temperature (degrees C)}
 #'
 #' @export
 tmp_water <- function(loc, lake, weather, albedo) {
@@ -137,7 +153,7 @@ tmp_water <- function(loc, lake, weather, albedo) {
 }
 
 # ------------------------------------------------------------------------------
-#' Equilibrium Temperature
+#' Temperature, equilibrium
 #'
 #' Calculates the equilibrium temperature based on de Bruin (1982) Equation 3,
 #' as presented in McMahon et al. (2013) S11.30.
@@ -148,11 +164,11 @@ tmp_water <- function(loc, lake, weather, albedo) {
 #'   Hydrol. Earth Syst. Sci., 17, 1331–1363,
 #'   https://doi.org/10.5194/hess-17-1331-2013, 2013.
 #'
-#' @inheritParams evap
+#' @inheritParams evaporation
 #' @param SBc Stefan-Boltzman constant (MJ/m^2/day). Defaults to 4.903e-9
 #'            MJ/m^2/day.
 #'
-#' @return {eqtmp}{equilibrium temperature (degrees C)}
+#' @return \item{eqtmp}{equilibrium temperature (degrees C)}
 #'
 #' @export
 tmp_equil <- function(loc, lake, weather, albedo, SBc = 4.903e-9) {
@@ -161,7 +177,7 @@ tmp_equil <- function(loc, lake, weather, albedo, SBc = 4.903e-9) {
   gamma   <- psychrometric_constant(loc$z)
   wbtmp   <- tmp_wet_bulb(weather$atmp, weather$RH)
   Deltawb <- vp_sat_curve_slope(wbtmp)
-  Rnwb    <- R_n("wet_bulb", loc, lake, weather, albedo$water)
+  Rnwb    <- R_n("wet_bulb", loc, lake, weather, albedo)
 
   eqtmp   <- wbtmp + Rnwb/(4*SBc*(wbtmp + 273.15)^3 + ufcn*(Deltawb + gamma))
 
@@ -169,7 +185,7 @@ tmp_equil <- function(loc, lake, weather, albedo, SBc = 4.903e-9) {
 }
 
 # ------------------------------------------------------------------------------
-#' Time Constant
+#' Time constant
 #'
 #' Calculates the time constant (day) based on McJannet et al. (2008) Equation 5
 #' and de Bruin (1982) Equation 4, as presented in McMahon et al. (2013) S11.29.
@@ -180,13 +196,13 @@ tmp_equil <- function(loc, lake, weather, albedo, SBc = 4.903e-9) {
 #'   Hydrol. Earth Syst. Sci., 17, 1331–1363,
 #'   https://doi.org/10.5194/hess-17-1331-2013, 2013.
 #'
-#' @inheritParams lake_evap
+#' @inheritParams evaporation
 #' @param rho_w density of water (kg/m^3), defaults to 997.9 kg/m^3 at 20 deg C
 #' @param cw specific heat of water (MJ/kg/K), defaults to 0.00419
 #' @param SBc Stefan-Boltzman constant (MJ/m^2/day). Defaults to 4.903e-9
 #'            MJ/m^2/day.
 #'
-#' @return {Ctime}{time constant (day)}
+#' @return \item{Ctime}{time constant (day)}
 #'
 #' @export
 time_const <- function(loc, lake, weather, rho_w = 997.9, cw = 0.00419,

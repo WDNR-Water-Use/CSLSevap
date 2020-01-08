@@ -2,7 +2,7 @@
 % Please edit documentation in R/radiation_functions.R
 \name{declination}
 \alias{declination}
-\title{Solar Declination}
+\title{Solar declination}
 \usage{
 declination(J)
 }

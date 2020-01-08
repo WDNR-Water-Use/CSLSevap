@@ -2,15 +2,15 @@
 % Please edit documentation in R/vapour_functions.R
 \name{vp_sat}
 \alias{vp_sat}
-\title{Saturation Vapour Pressure}
+\title{Vapour pressure, saturation}
 \usage{
 vp_sat(tmp)
 }
 \arguments{
-\item{tmp}{temperature of air or water (degrees C)}
+\item{tmp}{temperature of air or water (degrees C), vector or atomic number.}
 }
 \value{
-eo - saturation vapour pressure at the temperature (kPa)
+\item{eo}{saturation vapour pressure at the temperature (kPa)}
 }
 \description{
 Calculates the saturation vapour pressure at a given temperature based on

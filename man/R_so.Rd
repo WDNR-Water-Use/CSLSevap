@@ -2,7 +2,7 @@
 % Please edit documentation in R/radiation_functions.R
 \name{R_so}
 \alias{R_so}
-\title{Clear-Sky Solar Radiation}
+\title{Radiation, clear-sky solar}
 \usage{
 R_so(Ra, z)
 }

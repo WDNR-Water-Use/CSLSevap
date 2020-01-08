@@ -2,7 +2,7 @@
 % Please edit documentation in R/vapour_functions.R
 \name{vp_act_mean}
 \alias{vp_act_mean}
-\title{Mean Actual Vapour Pressure}
+\title{Vapour pressure, mean actual}
 \usage{
 vp_act_mean(atmp, RH)
 }
@@ -23,8 +23,7 @@ vector with hourly recorded relative humidities.}
 }
 \description{
 Calculates the mean actual vapour pressure for an hourly, daily, or larger
-time period based on Equation 17 (for daily or larger timestep) on pg. 38 of
-Allen et al. (1998).
+time period based on Equations 17 and 54 of Allen et al. (1998).
 }
 \references{
 Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop

@@ -2,7 +2,7 @@
 % Please edit documentation in R/wind_functions.R
 \name{u2_fcn}
 \alias{u2_fcn}
-\title{Wind Speed at 2m Height}
+\title{Wind speed at 2m height}
 \usage{
 u2_fcn(uz, z = 10)
 }
@@ -16,8 +16,8 @@ common height for wind speed measurements in meteorology.}
 \item{u2}{wind speed at 2 m above ground surface (m/s)}
 }
 \description{
-Calculates the wind speed at 2m height given a wind speed at zm height based
-on Equation 47 in Allen et al. (1998).
+Calculates the wind speed at 2 m height given a wind speed at z m height
+based on Equation 47 in Allen et al. (1998).
 }
 \references{
 Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop

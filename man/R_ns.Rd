@@ -2,7 +2,7 @@
 % Please edit documentation in R/radiation_functions.R
 \name{R_ns}
 \alias{R_ns}
-\title{Net Solar or Shortwave Radiation}
+\title{Radiation, net solar/shortwave}
 \usage{
 R_ns(Rs, albedo = 0.23)
 }

@@ -11,7 +11,7 @@
 # - tmp_wet_bulb
 #
 # ------------------------------------------------------------------------------
-#' Saturation Vapour Pressure
+#' Vapour pressure, saturation
 #'
 #' Calculates the saturation vapour pressure at a given temperature based on
 #' equation 11 of Allen et al. (1998).
@@ -20,9 +20,9 @@
 #'   evapotranspiration: Guidelines for computing crop water requirements. Rome:
 #'   FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
 #'
-#' @param tmp temperature of air or water (degrees C)
+#' @param tmp temperature of air or water (degrees C), vector or atomic number.
 #'
-#' @return eo - saturation vapour pressure at the temperature (kPa)
+#' @return \item{eo}{saturation vapour pressure at the temperature (kPa)}
 #'
 #' @export
 
@@ -32,11 +32,10 @@ vp_sat <- function(tmp) {
 }
 
 # ------------------------------------------------------------------------------
-#' Mean Saturation Vapour Pressure
+#' Vapour pressure, mean saturated
 #'
 #' Calculates the mean saturation vapour pressure for an hourly, daily, or
-#' larger time period based on Equation 12 (for daily or larger timestep) on pg.
-#' 36 of Allen et al. (1998).
+#' larger time period based on Equations 11 and 12 of Allen et al. (1998).
 #'
 #' @references Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
 #'   evapotranspiration: Guidelines for computing crop water requirements. Rome:
@@ -62,11 +61,10 @@ vp_sat_mean <- function(atmp) {
 }
 
 # ------------------------------------------------------------------------------
-#' Mean Actual Vapour Pressure
+#' Vapour pressure, mean actual
 #'
 #' Calculates the mean actual vapour pressure for an hourly, daily, or larger
-#' time period based on Equation 17 (for daily or larger timestep) on pg. 38 of
-#' Allen et al. (1998).
+#' time period based on Equations 17 and 54 of Allen et al. (1998).
 #'
 #' @references Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
 #'   evapotranspiration: Guidelines for computing crop water requirements. Rome:
@@ -96,12 +94,13 @@ vp_act_mean <- function(atmp, RH) {
 }
 
 # ------------------------------------------------------------------------------
-#' Vapour Pressure Deficit
+#' Vapour pressure deficit
 #'
-#' Calculates the vapour pressure deficit for a given time period (daily timestep
-#' or larger) using the mean daily minimum temperature, mean daily maximum
-#' temperature, mean daily minimum relative humidity, and mean daily maxiumum
-#' humidity during that time period. See p.39 in Allen et al. (1998).
+#' Calculates the vapour pressure deficit for a given time period (daily
+#' timestep or larger) using the mean daily minimum temperature, mean daily
+#' maximum temperature, mean daily minimum relative humidity, and mean daily
+#' maxiumum humidity during that time period. See p.39 and p.74 in Allen et al.
+#' (1998).
 #'
 #' @references Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
 #'   evapotranspiration: Guidelines for computing crop water requirements. Rome:
@@ -128,7 +127,7 @@ vp_deficit <- function(atmp, RH) {
 }
 
 # ------------------------------------------------------------------------------
-#' Slope of Saturation Vapour Pressure Curve
+#' Slope of saturation vapour pressure curve
 #'
 #' Calculates the slope of the saturation vapour ressure curve (i.e., the slope
 #' of the relationship between saturation vapour pressure and temperature) based
@@ -158,7 +157,7 @@ vp_sat_curve_slope <- function(atmp) {
 }
 
 # ------------------------------------------------------------------------------
-#' Psychrometric Constant
+#' Psychrometric constant
 #'
 #' Calculates the psychrometric constant for a given elevation based on Equation
 #' 7 and 8 in Allen et al. (1998).
@@ -195,7 +194,7 @@ psychrometric_constant <- function(z, atmp = NULL, lambda = 2.45,
 }
 
 # ------------------------------------------------------------------------------
-#' Latent Heat of Vaporization
+#' Latent heat of vaporization
 #'
 #' Calculates the latent heat of vaporization as a function of air temperature.
 #'
@@ -214,7 +213,7 @@ latent_heat_vapor <- function(atmp) {
 }
 
 # ------------------------------------------------------------------------------
-#' Dew Point Temperature
+#' Temperature, dew point
 #'
 #' Calculates the dew point temperature as a function of actual vapour pressure,
 #' based on McJannet et al. (2008) Equation 26 as presented in McMahon et al.
@@ -225,6 +224,12 @@ latent_heat_vapor <- function(atmp) {
 #'   evaporation using standard meteorological data: a pragmatic synthesis,
 #'   Hydrol. Earth Syst. Sci., 17, 1331–1363.
 #'   https://doi.org/10.5194/hess-17-1331-2013.
+#'
+#' @references McJannet, D. L., Webster, I. T., Stenson, M. P., and Sherman,
+#'   B.S. (2008). Estimating open water evaporation for the Murray-Darling
+#'   Basin. A report to the Australian Government from the CSIRO Murray-Darling
+#'   Basin Sustainable Yields Project, CSIRO, Australia, 50 pp. Retrieved from
+#'   http://www.clw.csiro.au/publications/waterforahealthycountry/mdbsy/technical/U-OpenWaterEvaporation.pdf.
 #'
 #' @param atmp air temperature (degrees C). When dt is "daily" or larger,
 #'             argument should be a list with elements "min" and "max" for daily
@@ -246,17 +251,23 @@ tmp_dew <- function(atmp, RH) {
 }
 
 # ------------------------------------------------------------------------------
-#' Wet Bulb Temperature
+#' Temperature, wet bulb
 #'
 #' Calculates the wet bulb temperature as a function of actual vapour pressure,
 #' dew point temperature, and air temperature based on McJannet et al. (2008)
 #' Equation 25 as presented in McMahon et al. (2013) Equation S2.2
 #'
 #' @references McMahon, T. A., Peel, M. C., Lowe, L., Srikanthan, R., and
-#'   McVicar, T. R.: Estimating actual, potential, reference crop and pan
+#'   McVicar, T. R. (2013). Estimating actual, potential, reference crop and pan
 #'   evaporation using standard meteorological data: a pragmatic synthesis,
-#'   Hydrol. Earth Syst. Sci., 17, 1331–1363,
-#'   https://doi.org/10.5194/hess-17-1331-2013, 2013.
+#'   Hydrol. Earth Syst. Sci., 17, 1331–1363.
+#'   https://doi.org/10.5194/hess-17-1331-2013.
+#'
+#' @references McJannet, D. L., Webster, I. T., Stenson, M. P., and Sherman,
+#'   B.S. (2008). Estimating open water evaporation for the Murray-Darling
+#'   Basin. A report to the Australian Government from the CSIRO Murray-Darling
+#'   Basin Sustainable Yields Project, CSIRO, Australia, 50 pp. Retrieved from
+#'   http://www.clw.csiro.au/publications/waterforahealthycountry/mdbsy/technical/U-OpenWaterEvaporation.pdf.
 #'
 #' @param atmp air temperature (degrees C). When dt is "daily" or larger,
 #'             argument should be a list with elements "min" and "max" for daily

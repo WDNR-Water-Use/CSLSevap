@@ -2,7 +2,7 @@
 % Please edit documentation in R/radiation_functions.R
 \name{R_nl}
 \alias{R_nl}
-\title{Net Longwave Radiation}
+\title{Radiation, net longwave}
 \usage{
 R_nl(dt, Rs, Rso, ea, atmp, SBc = 4.903e-09)
 }

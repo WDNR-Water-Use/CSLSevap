@@ -2,7 +2,7 @@
 % Please edit documentation in R/radiation_functions.R
 \name{R_n}
 \alias{R_n}
-\title{Net Solar or Shortwave Radiation}
+\title{Radiation, net}
 \usage{
 R_n(type = "FAO", loc, lake, weather, albedo)
 }
@@ -14,60 +14,60 @@ include "McJannet" for net radiation at lake temperature and
 
 \item{loc}{a list with location information that includes:
 \itemize{
-\item z - elevation above mean sea level (m)
-\item phi - latitude (radians). Positive for northern hemisphere, negative
-            for southern hemisphere.
-\item Lm - longitude of location (degrees west of Greenwich).
-\item Lz - longitude of location's timezone (degrees west of Greenwich). For
-           example, Lz = 75, 90, 105 and 120° for the Eastern, Central, Rocky
-           Mountain and Pacific time zones (United States) and Lz = 0° for
-           Greenwich, 330° for Cairo (Egypt), and 255° for Bangkok (Thailand)
+\item "z" - elevation above mean sea level (m)
+\item"phi" - latitude of location (radians). Positive for northern
+             hemisphere, negative for southern hemisphere.
+\item"Lm" - longitude of location (degrees west of Greenwich).
+\item"Lz" - longitude of location's measurement timezone (degrees west of
+            Greenwich). For example, Lz = 75, 90, 105 and 120° for
+            measurement times based on the Eastern, Central, Rocky Mountain
+            and Pacific time zones (United States) and Lz = 0° for Greenwich,
+            330° for Cairo (Egypt), and 255° for Bangkok (Thailand).
 }}
 
 \item{lake}{A list with lake data. Defaults to NULL, but for lake evaporation
-            calculations should include:
+            calculations, should include:
 \itemize{
-  \item A - surface area of the lake (km^2).
-  \item depth_m - depth of the lake (m).
-  \item lst - data frame with date (datetime) and ltmp (lake temperature, degC)
-  \item wtmp0 - initial water temperature for first day in datetimes.
+  \item "A" - surface area of the lake (km^2).
+  \item "depth_m" - depth of the lake (m). Can be a static value or vector
+                    corresponding with datetimes vector.
+  \item "lst" - optional data frame with date (datetime) and ltmp (lake
+                temperature, degC).
+  \item "wtmp0" - required initial water temperature for first day in
+                  datetimes (degC).
 
 }}
 
 \item{weather}{a list with weather data that includes:
 \itemize{
-\item dt - string indicating the timestep of input weather series. Expects
-           "hourly", "daily", or "monthly".
-\item datetimes - datetimes of weather records [POSIXct]. If monthly
-                  timestep, make sure date is the 15th of each month.
-\item atmp - If hourly timestep, vector of air temperature (degrees C)
-           corresponding with datetimes vector. If daily or monthly timestep,
-           list with two vectors, "min" and "max", with mean daily min and
-           max air temperature (degrees C) corresponding with datetimes
-           vector
-\item RH - If hourly timestep, vector of relative humidity (percent)
-           corresponding with datetimes vector. If daily or monthly timestep,
-           list with two vectors, "min" and "max", with mean daily min and
-           max relative humidity (percent) corresponding with datetimes
-           vector.
-\item Rs - vector of incoming solar or shortwave radiation (MJ/m^2/timestep),
-           corresponding with datetimes vector.
-\item wind - vector with mean windspead (m/s), corresponding with datetimes
-             vector.
-\item wind_elev - atomic number, height at which wind is measured (m)
-\item z0 - aerodynamic roughness of weather measurement site (m)
+\item "dt" - string indicating the timestep of input weather series. Expects
+             "hourly", "daily", or "monthly".
+\item "datetimes" - datetimes of weather records [POSIXct]. If monthly
+                    timestep, make sure date is the 15th of each month.
+\item "atmp" - If hourly timestep, vector of air temperature (degrees C)
+               corresponding with datetimes vector. If daily or monthly
+               timestep, list with two vectors, "min" and "max", with mean
+               daily min and max air temperature (degrees C) corresponding
+               with datetimes vector
+\item "RH" - If hourly timestep, vector of relative humidity (percent)
+             corresponding with datetimes vector. If daily or monthly
+             timestep, list with two vectors, "min" and "max", with mean
+             daily min and max relative humidity (percent) corresponding with
+             datetimes vector.
+\item "Rs" - vector of incoming solar or shortwave radiation (MJ/m^2/hr if
+             hourly timestep, MG/m^2/day if daily or monthly), corresponding
+             with datetimes vector.
+\item "wind" - vector with mean wind speed (m/s), corresponding with
+               datetimes vector.
+\item "wind_elev" - atomic number, height at which wind is measured (m)
+\item "z0" - aerodynamic roughness of weather measurement site (m)
 }}
 
-\item{albedo}{a list with albedos for different surfaces including (defaults):
+\item{albedo}{a list with albedos for different surfaces, defaults to:
 \itemize{
-  \item ref_crop - albedo of the hypothetical grass reference crop, 0.23
-  \item water - albedo of water, 0.08.
+  \item "ref_crop" - albedo of the hypothetical grass reference crop, 0.23
+  \item "water" - albedo of water, 0.08.
 }}
-
-\item{Gsc}{solar constant (MJ/m^2/min). Defaults to 0.0820 MJ/m^2/min.}
-
-\item{SBc}{Stefan-Boltzman constant (MJ/m^2/day). Defaults to 4.903e-9
-MJ/m^2/day.}
 }
 \value{
 \item{Rn}{net radiation (MJ/m^2/timestep)}

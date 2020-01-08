@@ -4,15 +4,17 @@ CSLSevap is an R package containing multiple evaporation functions useful to the
 
  * FAO Penman-Monteith Reference Evapotranspiration
  * McJannet lake evaporation
- 
+
+For most uses, it is only necessary to interact with the "evaporation" function. However all functions are made accessible to the user since they may be useful in other contexts (e.g., for saturation vapor pressure, dew point temperature).
+
 ## Installation
 
 To install from within the WI DNR (assumes you're using R Studio and are familiar with installing other packages):
 
- 1. Navigate to the CSLSevap package by either:  
-    * Opening `CSLSevap.proj` from the CSLSevap folder (Z:\WQWT_PROJECTS\WY_MS_Monitoring\2018 Summer Field Crew\Central Sands Lake Study\Analysis_2019\CSLSevap) (preferred)  
-    * Set your working directory to the CSLSevap folder `setwd("Z:/WQWT_PROJECTS/WY_MS_Monitoring/2018 Summer Field Crew/Central Sands Lake Study/Analysis_2019/CSLSevap")`  
-    
+ 1. Navigate to the CSLSevap package by either:
+    * Opening `CSLSevap.proj` from the CSLSevap folder (Z:\WQWT_PROJECTS\WY_MS_Monitoring\2018 Summer Field Crew\Central Sands Lake Study\Analysis_2019\CSLSevap) (preferred)
+    * Set your working directory to the CSLSevap folder `setwd("Z:/WQWT_PROJECTS/WY_MS_Monitoring/2018 Summer Field Crew/Central Sands Lake Study/Analysis_2019/CSLSevap")`
+
     **Note:** If you want to be able to knit an Rmd file that is saved within this package, you must have the shared network mapped to a letter drive (e.g., "Z:/" for "//central/water/") and you must open the .proj workspace (or set your working directory) via this letter drive. If you don't, knitting will fail with a less-than-helpful error message (that doesn't mention anything about the letter drive requirement).
  2. While your working directory is set to the top level of `CSLSevap`, use the R package `devtools` to install locally.
     ```R

@@ -2,56 +2,60 @@
 % Please edit documentation in R/heat_functions.R
 \name{time_const}
 \alias{time_const}
-\title{Time Constant}
+\title{Time constant}
 \usage{
-time_const(loc, lake, weather, rho_w = 997.9, cw = 0.00419,
-  SBc = 4.903e-09)
+time_const(loc, lake, weather, rho_w = 997.9, cw = 0.00419, SBc = 4.903e-09)
 }
 \arguments{
 \item{loc}{a list with location information that includes:
 \itemize{
-  \item z - elevation above mean sea level (m)
-  \item phi - latitude (radians). Positive for northern hemisphere, negative
-            for southern hemisphere.
-  \item Lm - longitude of location (degrees west of Greenwich). Only needed if
-           input data is hourly.
-  \item Lz - longitude of location's timezone (degrees west of Greenwich).
-             For example, Lz = 75, 90, 105 and 120° for the Eastern, Central,
-             Rocky Mountain and Pacific time zones (United States) and Lz =
-             0° for Greenwich, 330° for Cairo (Egypt), and 255° for Bangkok
-             (Thailand). Only needed if input is hourly.
+\item "z" - elevation above mean sea level (m)
+\item"phi" - latitude of location (radians). Positive for northern
+             hemisphere, negative for southern hemisphere.
+\item"Lm" - longitude of location (degrees west of Greenwich).
+\item"Lz" - longitude of location's measurement timezone (degrees west of
+            Greenwich). For example, Lz = 75, 90, 105 and 120° for
+            measurement times based on the Eastern, Central, Rocky Mountain
+            and Pacific time zones (United States) and Lz = 0° for Greenwich,
+            330° for Cairo (Egypt), and 255° for Bangkok (Thailand).
 }}
 
-\item{lake}{a list with lake data that includes:
+\item{lake}{A list with lake data. Defaults to NULL, but for lake evaporation
+            calculations, should include:
 \itemize{
-  \item A - surface area of the lake (km^2).
-  \item depth_m - depth of the lake (m).
-  \item lst - data frame with date (datetime) and ltmp (lake temperature, degC)
+  \item "A" - surface area of the lake (km^2).
+  \item "depth_m" - depth of the lake (m). Can be a static value or vector
+                    corresponding with datetimes vector.
+  \item "lst" - optional data frame with date (datetime) and ltmp (lake
+                temperature, degC).
+  \item "wtmp0" - required initial water temperature for first day in
+                  datetimes (degC).
+
 }}
 
 \item{weather}{a list with weather data that includes:
 \itemize{
-  \item dt - string indicating the timestep of input weather series. Expects
+\item "dt" - string indicating the timestep of input weather series. Expects
              "hourly", "daily", or "monthly".
-  \item datetimes - datetimes of weather records [POSIXct]. If monthly
+\item "datetimes" - datetimes of weather records [POSIXct]. If monthly
                     timestep, make sure date is the 15th of each month.
-  \item atmp - If hourly timestep, vector of air temperature (degrees C)
+\item "atmp" - If hourly timestep, vector of air temperature (degrees C)
                corresponding with datetimes vector. If daily or monthly
                timestep, list with two vectors, "min" and "max", with mean
                daily min and max air temperature (degrees C) corresponding
-               with datetimes vector.
-  \item RH - If hourly timestep, vector of relative humidity (percent)
+               with datetimes vector
+\item "RH" - If hourly timestep, vector of relative humidity (percent)
              corresponding with datetimes vector. If daily or monthly
              timestep, list with two vectors, "min" and "max", with mean
              daily min and max relative humidity (percent) corresponding with
              datetimes vector.
-  \item Rs - vector of incoming solar or shortwave radiation (MJ/m^2/timestep),
-             corresponding with datetimes vector.
-  \item wind - vector with mean windspead (m/s), corresponding with datetimes
-               vector.
-  \item wind_elev - atomic number, height at which wind is measured (m)
-  \item z0 - aerodynamic roughness of measurement site (m)
-  \item wtmp0 - initial water temperature for first day in datetimes.
+\item "Rs" - vector of incoming solar or shortwave radiation (MJ/m^2/hr if
+             hourly timestep, MG/m^2/day if daily or monthly), corresponding
+             with datetimes vector.
+\item "wind" - vector with mean wind speed (m/s), corresponding with
+               datetimes vector.
+\item "wind_elev" - atomic number, height at which wind is measured (m)
+\item "z0" - aerodynamic roughness of weather measurement site (m)
 }}
 
 \item{rho_w}{density of water (kg/m^3), defaults to 997.9 kg/m^3 at 20 deg C}
@@ -62,7 +66,7 @@ time_const(loc, lake, weather, rho_w = 997.9, cw = 0.00419,
 MJ/m^2/day.}
 }
 \value{
-{Ctime}{time constant (day)}
+\item{Ctime}{time constant (day)}
 }
 \description{
 Calculates the time constant (day) based on McJannet et al. (2008) Equation 5
