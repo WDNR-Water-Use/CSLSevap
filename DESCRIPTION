@@ -1,7 +1,7 @@
 Package: CSLSevap
 Type: Package
 Title: Evapo(transpi)ration Calculations
-Version: 1.0.1
+Version: 1.0.2
 Author: Carolyn Voter <cvoter@wisc.edu>
 Maintainer: Carolyn Voter <cvoter@wisc.edu>
 Description: Multiple ways of calculating evapo(transpi)ration.

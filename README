@@ -4,6 +4,7 @@ CSLSevap is an R package containing multiple evaporation functions useful to the
 
  * FAO Penman-Monteith Reference Evapotranspiration
  * McJannet lake evaporation
+ * Unmodified Hamond lake evaporation
 
 For most uses, it is only necessary to interact with the "evaporation" function. However all functions are made accessible to the user since they may be useful in other contexts (e.g., for saturation vapor pressure, dew point temperature).
 
