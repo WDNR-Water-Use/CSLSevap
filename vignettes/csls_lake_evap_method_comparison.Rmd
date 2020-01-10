@@ -1,0 +1,24 @@
+---
+title: "CSLS Lake Evaporation Method Comparison"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{csls_lake_evap_method_comparison}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+```{r setup}
+library(CSLSevap)
+library(CSLSiso)
+library(CSLSdata)
+
+lakes <- c("Pleasant", "Long", "Plainfield")
+```
+
+```{r data}
+weather <- CSLSdata::weather
+for (lake in lakes){
+  CSLSiso::
+}
+
+
+```
