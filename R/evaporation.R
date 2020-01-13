@@ -107,7 +107,7 @@
 #'
 #' @return \item{evap}{Evapo(transpi)ration (mm/hour or mm/day)}
 #'
-#' @importFrom NISTunits NISTdegCtOk
+#' @importFrom NISTunits NISTdegCtOk NISTinchTOmeter
 #' @import lubridate
 #'
 #' @export
@@ -180,6 +180,7 @@ evaporation <- function(method = "FAO", loc, weather, lake = NULL,
 
     # Lake evaporation
     evap <- 0.55*((D/12)^2)*(svd/100)
+    evap <- NISTinchTOmeter(evap)*1000
   }
 
   # Adjust for no condensation, if needed

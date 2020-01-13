@@ -9,15 +9,21 @@ Description: Multiple ways of calculating evapo(transpi)ration.
     Hamond lake evaporation. See help for the "evaporation" function for 
     required inputs for each method.
 Imports:
+  CSLSdata,
   lubridate,
 	rlang,
-	NISTunits
+	NISTunits,
+	magrittr,
+	dplyr,
+	zoo
 Suggests:
     knitr,
     devtools,
     roxygen2,
     testthat,
-    rmarkdown
+    rmarkdown,
+    ggplot2,
+    reshape2
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

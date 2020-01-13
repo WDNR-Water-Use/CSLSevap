@@ -12,9 +12,7 @@ For most uses, it is only necessary to interact with the "evaporation" function.
 
 To install from within the WI DNR (assumes you're using R Studio and are familiar with installing other packages):
 
- 1. Navigate to the CSLSevap package by either:
-    * Opening `CSLSevap.proj` from the CSLSevap folder (Z:\WQWT_PROJECTS\WY_MS_Monitoring\2018 Summer Field Crew\Central Sands Lake Study\Analysis_2019\CSLSevap) (preferred)
-    * Set your working directory to the CSLSevap folder `setwd("Z:/WQWT_PROJECTS/WY_MS_Monitoring/2018 Summer Field Crew/Central Sands Lake Study/Analysis_2019/CSLSevap")`
+ 1. Navigate to the CSLSevap package by opening `CSLSevap.proj` from the CSLSevap folder (Z:\WQWT_PROJECTS\WY_MS_Monitoring\2018 Summer Field Crew\Central Sands Lake Study\Analysis_2019\CSLSevap). This automatically sets your working directory to the CSLSevap folder.
 
     **Note:** If you want to be able to knit an Rmd file that is saved within this package, you must have the shared network mapped to a letter drive (e.g., "Z:/" for "//central/water/") and you must open the .proj workspace (or set your working directory) via this letter drive. If you don't, knitting will fail with a less-than-helpful error message (that doesn't mention anything about the letter drive requirement).
  2. While your working directory is set to the top level of `CSLSevap`, use the R package `devtools` to install locally.
@@ -30,6 +28,8 @@ This package is organized based on [R package conventions](http://r-pkgs.had.co.
  * Package metadata (`DESCRIPTION`)
  * Code and data documentation (`man/`)
  * Tests (`tests/`)
+ * Vignettes (`vignettes/`)
+ * Knitted .Rmd documents and other documentation (`doc/`)
 
 From within RStudio:
 
