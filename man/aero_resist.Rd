@@ -9,7 +9,7 @@ aero_resist(uz, wind_z, z0, A, lake_z, rho_a = 1.2, ca = 0.001013)
 \arguments{
 \item{uz}{wind speed at wind_z height (m/s)}
 
-\item{wind_z}{height at which uz is measured (m)}
+\item{wind_z}{height at which \code{uz} is measured (m)}
 
 \item{z0}{aerodynamic roughness of land cover at measurement site (m)}
 
@@ -31,14 +31,14 @@ and as presented in McMahon et al. (2013) Equation S11.23.
 }
 \references{
 McMahon, T. A., Peel, M. C., Lowe, L., Srikanthan, R., and
-  McVicar, T. R. (2013). Estimating actual, potential, reference crop and pan
-  evaporation using standard meteorological data: a pragmatic synthesis,
-  Hydrol. Earth Syst. Sci., 17, 1331–1363.
-  https://doi.org/10.5194/hess-17-1331-2013.
+McVicar, T. R. (2013). Estimating actual, potential, reference crop and pan
+evaporation using standard meteorological data: a pragmatic synthesis,
+Hydrol. Earth Syst. Sci., 17, 1331–1363.
+https://doi.org/10.5194/hess-17-1331-2013.
 
 McJannet, D. L., Webster, I. T., Stenson, M. P., and Sherman,
-  B.S. (2008). Estimating open water evaporation for the Murray-Darling
-  Basin. A report to the Australian Government from the CSIRO Murray-Darling
-  Basin Sustainable Yields Project, CSIRO, Australia, 50 pp. Retrieved from
-  http://www.clw.csiro.au/publications/waterforahealthycountry/mdbsy/technical/U-OpenWaterEvaporation.pdf.
+B.S. (2008). Estimating open water evaporation for the Murray-Darling
+Basin. A report to the Australian Government from the CSIRO Murray-Darling
+Basin Sustainable Yields Project, CSIRO, Australia, 50 pp. Retrieved from
+http://www.clw.csiro.au/publications/waterforahealthycountry/mdbsy/technical/U-OpenWaterEvaporation.pdf.
 }

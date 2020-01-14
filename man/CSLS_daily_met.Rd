@@ -2,7 +2,7 @@
 % Please edit documentation in R/CSLS_daily_met.R
 \name{CSLS_daily_met}
 \alias{CSLS_daily_met}
-\title{Calculate Lake Evaporation}
+\title{Given CSLS lake and method, calculate daily evaporation}
 \usage{
 CSLS_daily_met(
   method = "McJannet",
@@ -36,9 +36,8 @@ time zones (United States).}
 evapotranspiration values (i.e., condensation) to zero}
 }
 \value{
-weather, a data frame with daily weather information including:
-\describe{
-\item{date}{day of each weather observation}
+\strong{weather}, a data frame with daily weather information including:
+\item{date}{day of each weather observation \link{POSIXct}}
 \item{atmp_min}{minimum air temperature for the day (deg C)}
 \item{atmp_max}{maximum air temperature for the day (deg C)}
 \item{RH_min}{minimum relative humidity for the day (percent)}
@@ -46,7 +45,21 @@ weather, a data frame with daily weather information including:
 \item{P}{total precipitation for the day (mm)}
 \item{E}{total lake evaporation for the day (mm)}
 }
-}
 \description{
-Calculates Lake Evaporation
+This function calculates daily evaporation for a CSLS lake given the desired
+method and lake name. While this function can use any of the methods
+availaible in \code{\link{evaporation}}, it is currently hardwired to load
+input data from the CSLS field campaign (as available in \pkg{CSLSdata}) and
+analysis is restricted to dates with available weather, lake surface
+temperature, and lake level data (via \code{\link{CSLS_find_common_dates}})
+regardless of the requirements of the chosen method.
+}
+\examples{
+# Note that "lakename" is not really used for "Hamon" method
+# However, this function is currently hardwired to require it.
+lake      <- "Pleasant"
+daily_met <- CSLS_daily_met("McJannet", lakename = lake)
+daily_met <- CSLS_daily_met("McJannet", use_lst = FALSE, lakename = lake)
+daily_met <- CSLS_daily_met("Hamon", lakename = lake)
+
 }

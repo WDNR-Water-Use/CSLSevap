@@ -14,7 +14,7 @@ a vector with hourly recorded temperatures.}
 }
 \value{
 \item{es}{mean saturation vapour pressure (kPa) during time period of
-                  interest}
+interest}
 }
 \description{
 Calculates the mean saturation vapour pressure for an hourly, daily, or
@@ -22,6 +22,6 @@ larger time period based on Equations 11 and 12 of Allen et al. (1998).
 }
 \references{
 Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
-  evapotranspiration: Guidelines for computing crop water requirements. Rome:
-  FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
+evapotranspiration: Guidelines for computing crop water requirements. Rome:
+FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
 }

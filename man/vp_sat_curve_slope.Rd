@@ -14,7 +14,7 @@ a vector with hourly recorded temperatures.}
 }
 \value{
 \item{Delta}{slope of the saturation vapour pressure curve at the
-                     given air temperature}
+given air temperature}
 }
 \description{
 Calculates the slope of the saturation vapour ressure curve (i.e., the slope
@@ -23,6 +23,6 @@ on Equation 13 in Allen et al. (1998).
 }
 \references{
 Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
-  evapotranspiration: Guidelines for computing crop water requirements. Rome:
-  FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
+evapotranspiration: Guidelines for computing crop water requirements. Rome:
+FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
 }

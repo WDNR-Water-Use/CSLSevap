@@ -18,23 +18,23 @@ precipitation (P), and wind speed (wind).}
 \value{
 weather a list with weather data that includes:
 \item{dt}{string indicating the timestep of input weather series. Expects
-             "hourly", "daily", or "monthly".}
-\item{datetimes}{datetimes of weather records [POSIXct]. If monthly timestep,
-                 make sure date is the 15th of each month.}
+"hourly", "daily", or "monthly".}
+\item{datetimes}{datetimes of weather records \link{POSIXct}. If monthly timestep,
+make sure date is the 15th of each month.}
 \item{atmp}{If hourly timestep, vector of air temperature (degrees C)
-            corresponding with datetimes vector. If daily or monthly
-            timestep, list with two vectors, "min" and "max", with mean daily
-            min and max air temperature (degrees C) corresponding with
-            datetimes vector}
+corresponding with datetimes vector. If daily or monthly
+timestep, list with two vectors, "min" and "max", with mean daily
+min and max air temperature (degrees C) corresponding with
+datetimes vector}
 \item{RH}{If hourly timestep, vector of relative humidity (percent)
-          corresponding with datetimes vector. If daily or monthly timestep,
-          list with two vectors, "min" and "max", with mean daily min and max
-          relative humidity (percent) corresponding with datetimes vector.}
+corresponding with datetimes vector. If daily or monthly timestep,
+list with two vectors, "min" and "max", with mean daily min and max
+relative humidity (percent) corresponding with datetimes vector.}
 \item{Rs}{vector of incoming solar or shortwave radiation (MJ/m^2/hr if
-          hourly timestep, MG/m^2/day if daily or monthly), corresponding
-          with datetimes vector.}
+hourly timestep, MG/m^2/day if daily or monthly), corresponding
+with datetimes vector.}
 \item{wind}{vector with mean wind speed (m/s), corresponding with datetimes
-            vector.}
+vector.}
 \item{wind_elev}{atomic number, height at which wind is measured (m)}
 \item{z0}{aerodynamic roughness of weather measurement site (m)}
 }

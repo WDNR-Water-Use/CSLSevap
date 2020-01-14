@@ -1,6 +1,19 @@
 #' Given CSLS data, find common dates of record
 #'
-#' Finds date interval with records for lst, weather, and lake levels.
+#' Finds date interval with records for lst, weather, and lake levels. Checks
+#' for the latest "start" date in each of these timeseries, then checks for the
+#' earliest "end" date in each timeseries, then restricts all input data to be
+#' within the overlapping interval. Lastly, interpolates the \code{lake_levels}
+#' dataset over \code{NA} values to ensure a continuous timeseries of lake area and
+#' lake depth for evaporation calculations.
+#'
+#' Note that this function may cause undesired behavior when using
+#' \code{\link{CSLS_daily_met}} with the Unmodified Hammon method or the
+#' McJannet method with \code{use_lst = FALSE}. Neither uses the \code{lst}
+#' dataset for calculations, yet other input data is restricted based on the
+#' availability of the \code{lst} dataset. Unmodified Hamon also does not use
+#' \code{lake_levels}, but is restricted by the avilability of that dataset as
+#' well.
 #'
 #' @param weather a data frame with hourly weather data incl. air temperature
 #'                (atmp), relative humidity (RH), incoming solar radiation (Rs),
@@ -12,16 +25,17 @@
 #'            measurements as formatted in the lst_HOBO dataset, subset
 #'            for a single lake.
 #'
-#' @return :
-#' \item{z}{elevation above mean sea level (m)}
-#' \item{phi}{latitude of location (radians). Positive for northern
-#'            hemisphere, negative for southern hemisphere}
-#' \item{Lm}{longitude of location (degrees west of Greenwich)}
-#' \item{Lz}{longitude of location's measurement timezone (degrees west of
-#'             Greenwich). For example, Lz = 75, 90, 105 and 120° for
-#'             measurement times based on the Eastern, Central, Rocky Mountain
-#'             and Pacific time zones (United States) and Lz = 0° for Greenwich,
-#'             330° for Cairo (Egypt), and 255° for Bangkok (Thailand).}
+#' @return a list with the following items:
+#' \item{weather}{same as input weather data frame, but filtered to only include
+#'                data during the overlap time period}
+#' \item{lst}{same as input lst data frame, but filtered to only include data
+#'            during the overlap time period and summarized at a daily time
+#'            step}
+#' \item{lake_levels}{same as input lake_levels data frame, but filtered to only
+#'                    include data during the overlap time period and with
+#'                    missing (NA) lake levels interpolated}
+#' \item{wtmp0}{initial lake surface temperatuer (degC) from the day before the
+#'              weather, lst, and lake_levels timeseries begin}
 #'
 #' @importFrom magrittr %>%
 #' @importFrom dplyr group_by summarise ungroup arrange select

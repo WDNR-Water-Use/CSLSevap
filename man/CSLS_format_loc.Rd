@@ -15,16 +15,16 @@ ranges from 0 to 360 degrees). Defaults to 90 for Central Time
 Zone, USA.}
 }
 \value{
-loc, a list with the following location-specific parameters:
+*\emph{loc}, a list with the following location-specific parameters:
 \item{z}{elevation above mean sea level (m)}
 \item{phi}{latitude of location (radians). Positive for northern
-           hemisphere, negative for southern hemisphere}
+hemisphere, negative for southern hemisphere}
 \item{Lm}{longitude of location (degrees west of Greenwich)}
 \item{Lz}{longitude of location's measurement timezone (degrees west of
-            Greenwich). For example, Lz = 75, 90, 105 and 120° for
-            measurement times based on the Eastern, Central, Rocky Mountain
-            and Pacific time zones (United States) and Lz = 0° for Greenwich,
-            330° for Cairo (Egypt), and 255° for Bangkok (Thailand).}
+Greenwich). For example, Lz = 75, 90, 105 and 120° for
+measurement times based on the Eastern, Central, Rocky Mountain
+and Pacific time zones (United States) and Lz = 0° for Greenwich,
+330° for Cairo (Egypt), and 255° for Bangkok (Thailand).}
 }
 \description{
 Extracts location information for the lake from the dictionary and reformats

@@ -24,8 +24,8 @@ on Equation S4.4 in McMahon et al. (2013).
 }
 \references{
 McMahon, T. A., Peel, M. C., Lowe, L., Srikanthan, R., and
-  McVicar, T. R. (2013). Estimating actual, potential, reference crop and pan
-  evaporation using standard meteorological data: a pragmatic synthesis,
-  Hydrol. Earth Syst. Sci., 17, 1331–1363.
-  https://doi.org/10.5194/hess-17-1331-2013.
+McVicar, T. R. (2013). Estimating actual, potential, reference crop and pan
+evaporation using standard meteorological data: a pragmatic synthesis,
+Hydrol. Earth Syst. Sci., 17, 1331–1363.
+https://doi.org/10.5194/hess-17-1331-2013.
 }

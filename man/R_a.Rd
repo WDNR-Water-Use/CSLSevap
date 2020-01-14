@@ -10,7 +10,7 @@ R_a(dt, datetimes, phi, Lm, Lz, Gsc = 0.082)
 \item{dt}{a string indicating the timestep of calculation. If not "hourly",
 assumes a daily or larger timestep}
 
-\item{datetimes}{timeseries of datetimes to use in calculations [POSIXct]}
+\item{datetimes}{timeseries of datetimes to use in calculations \link{POSIXct}}
 
 \item{phi}{latitude of the location (radians). Positive for northern
 hemisphere, negative for southern hemisphere.}
@@ -27,7 +27,7 @@ and 255° for Bangkok (Thailand).}
 }
 \value{
 \item{Ra}{extraterrestrial radiation (MJ/m^2/day) or (MJ/m^2/hour),
-             depending on length of input time period}
+depending on length of input time period}
 }
 \description{
 Calculates the extraterrestrial radiation for a given location and timestep.
@@ -36,6 +36,6 @@ shorter periods, uses Equation 28 from Allen et al. (1998).
 }
 \references{
 Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
-  evapotranspiration: Guidelines for computing crop water requirements. Rome:
-  FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
+evapotranspiration: Guidelines for computing crop water requirements. Rome:
+FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
 }

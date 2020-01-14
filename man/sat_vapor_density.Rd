@@ -21,8 +21,8 @@ Equation 2.6 in Harwell (2012).
 }
 \references{
 Harwell, G.R., 2012, Estimation of evaporation from open water—A
-  review of selected studies, summary of U.S. Army Corps of Engineers data
-  collection and methods, and evaluation of two methods for estimation of
-  evaporation from five reservoirs in Texas: U.S. Geological Survey
-  Scientific Investigations Report 2012–5202, 96 p.
+review of selected studies, summary of U.S. Army Corps of Engineers data
+collection and methods, and evaluation of two methods for estimation of
+evaporation from five reservoirs in Texas: U.S. Geological Survey
+Scientific Investigations Report 2012–5202, 96 p.
 }

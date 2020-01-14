@@ -15,7 +15,7 @@
 #' @param wtmp0 initial water temperature for first day in timeseries (degC)
 #' @inheritParams CSLS_daily_met
 #'
-#' @return lake, a list with the following lake-specific parameters:
+#' @return **lake**, a list with the following lake-specific parameters:
 #' \item{A}{surface area of the lake (km^2)}
 #' \item{depth_m}{depth of the lake (m). Can be a static value or vector
 #'               corresponding with datetimes vector.}

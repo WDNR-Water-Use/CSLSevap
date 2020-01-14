@@ -20,6 +20,6 @@ Calculates the clear-sky solar radiation based on Equation 37 in Allen et al.
 }
 \references{
 Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
-  evapotranspiration: Guidelines for computing crop water requirements. Rome:
-  FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
+evapotranspiration: Guidelines for computing crop water requirements. Rome:
+FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
 }

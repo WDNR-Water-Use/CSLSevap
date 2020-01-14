@@ -2,25 +2,22 @@
 #'
 #' Calculates evaporation (mm/day given daily or monthly inputs, or mm/hour
 #' given hourly inputs) using specified method. Options include:
-#' \enumerate{
-#'   \item "FAO" - FAO Penman-Montieth reference evapotranspiration (potential
+#'  1. **FAO**: FAO Penman-Montieth reference evapotranspiration (potential
 #'                 evaporation for a reference grass crop) based on Allen et al.
 #'                 (1998) for hourly, daily, or monthly timestep.
-#'   \item "McJannet" - Daily lake evaporation based on the method in McJannet et al.
+#'  2. **McJannet**: Daily lake evaporation based on the method in McJannet et al.
 #'                      (2008) as presented in McMahon et al. (2013)
-#'   \item "Hamon" - Daily lake evaporation based on the unmodified Hamon method
+#'  3. **Hamon**: Daily lake evaporation based on the unmodified Hamon method
 #'                   as presented in Harwell (2012)
-#' }
 #'
 #' When assessing which parameters are required for a given method, use the
 #' following guidelines:
-#' \itemize{
-#' \item "loc" - FAO (all), McJanet (all), Hamond (only "phi")
-#' \item "weather" - FAO (all but "z0"), McJanet (all), Hamond (only "datetimes"
-#'                   and "atmp" list with min and max daily atmp)
-#' \item "lake" - FAO (not required, use default NULL value), McJanet (all but
-#'                "lst"), Hamond (not required, use default NULL value).
-#'  }
+#'
+#' | **Input** | **FAO**        | **McJannet**  | **Hamond**                |
+#' | --------- | -------------- | ------------- | ------------------------- |
+#' | loc       | all            | all           | only *phi*                |
+#' | weather   | all but *z0*   | all           | only *datetimes* & *atmp* |
+#' | lake      | none, use NULL | all but *lst* | none, use NULL            |
 #'
 #' @references Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
 #'   evapotranspiration: Guidelines for computing crop water requirements. Rome:
@@ -47,65 +44,59 @@
 #' @param method denotes which evaporation method to use ("FAO", "McJannet", or
 #'               "Hamon").
 #' @param loc a list with location information that includes:
-#' \itemize{
-#' \item "z" - elevation above mean sea level (m)
-#' \item"phi" - latitude of location (radians). Positive for northern
+#'  * **z**: elevation above mean sea level (m)
+#'  * **phi**: latitude of location (radians). Positive for northern
 #'              hemisphere, negative for southern hemisphere.
-#' \item"Lm" - longitude of location (degrees west of Greenwich).
-#' \item"Lz" - longitude of location's measurement timezone (degrees west of
+#'  * **Lm**: longitude of location (degrees west of Greenwich).
+#'  * **Lz**: longitude of location's measurement timezone (degrees west of
 #'             Greenwich). For example, Lz = 75, 90, 105 and 120° for
 #'             measurement times based on the Eastern, Central, Rocky Mountain
 #'             and Pacific time zones (United States) and Lz = 0° for Greenwich,
 #'             330° for Cairo (Egypt), and 255° for Bangkok (Thailand).
-#' }
 #' @param weather a list with weather data that includes:
-#' \itemize{
-#' \item "dt" - string indicating the timestep of input weather series. Expects
+#'  * **dt**: string indicating the timestep of input weather series. Expects
 #'              "hourly", "daily", or "monthly".
-#' \item "datetimes" - datetimes of weather records [POSIXct]. If monthly
+#'  * **datetimes**: datetimes of weather records [POSIXct]. If monthly
 #'                     timestep, make sure date is the 15th of each month.
-#' \item "atmp" - If hourly timestep, vector of air temperature (degrees C)
+#'  * **atmp**: If hourly timestep, vector of air temperature (degrees C)
 #'                corresponding with datetimes vector. If daily or monthly
 #'                timestep, list with two vectors, "min" and "max", with mean
 #'                daily min and max air temperature (degrees C) corresponding
 #'                with datetimes vector
-#' \item "RH" - If hourly timestep, vector of relative humidity (percent)
+#'  * **RH**: If hourly timestep, vector of relative humidity (percent)
 #'              corresponding with datetimes vector. If daily or monthly
 #'              timestep, list with two vectors, "min" and "max", with mean
 #'              daily min and max relative humidity (percent) corresponding with
 #'              datetimes vector.
-#' \item "Rs" - vector of incoming solar or shortwave radiation (MJ/m^2/hr if
+#'  * **Rs**: vector of incoming solar or shortwave radiation (MJ/m^2/hr if
 #'              hourly timestep, MG/m^2/day if daily or monthly), corresponding
 #'              with datetimes vector.
-#' \item "wind" - vector with mean wind speed (m/s), corresponding with
+#'  * **wind**: vector with mean wind speed (m/s), corresponding with
 #'                datetimes vector.
-#' \item "wind_elev" - atomic number, height at which wind is measured (m)
-#' \item "z0" - aerodynamic roughness of weather measurement site (m)
-#' }
+#'  * **wind_elev**: atomic number, height at which wind is measured (m)
+#'  * **z0**: aerodynamic roughness of weather measurement site (m)
 #'
 #' @param lake A list with lake data. Defaults to NULL, but for McJannet lake
 #'             evaporation calculations, should include:
-#' \itemize{
-#'   \item "A" - surface area of the lake (km^2).
-#'   \item "depth_m" - depth of the lake (m). Can be a static value or vector
+#'  * **A**: surface area of the lake (km^2).
+#'  * **depth_m**: depth of the lake (m). Can be a static value or vector
 #'                     corresponding with datetimes vector.
-#'   \item "lst" - optional data frame with date (datetime) and ltmp (lake
+#'  * **lst**: optional data frame with date (datetime) and ltmp (lake
 #'                 temperature, degC).
-#'   \item "wtmp0" - required initial water temperature for first day in
+#'  * **wtmp0**: required initial water temperature for first day in
 #'                   datetimes (degC).
 #'
-#' }
 #' @param albedo a list with albedos for different surfaces, defaults to:
-#' \itemize{
-#'   \item "ref_crop" - albedo of the hypothetical grass reference crop, 0.23
-#'   \item "water" - albedo of water, 0.08.
-#' }
+#'  * **ref_crop**: albedo of the hypothetical grass reference crop, 0.23
+#'  * **water**: albedo of water, 0.08.
+#'
 #' @param rho_a density of the air (kg/m^3), defaults to 1.20 kg/m^3 at 20 deg C
 #' @param ca specific heat of the air (MJ/kg/K), defaults to 0.001013 MJ/kg/K
 #' @param no_condensation defaults to TRUE to force negative evapotranspiration
 #'                        values (i.e., condensation) to zero
 #'
-#' @return \item{evap}{Evapo(transpi)ration (mm/hour or mm/day)}
+#' @return \item{evap}{a vector with evapo(transpi)ration (mm/hour or mm/day)
+#'                     for each timestep in \code{weather$datetimes}}
 #'
 #' @importFrom NISTunits NISTdegCtOk NISTinchTOmeter
 #' @import lubridate

@@ -1,31 +1,25 @@
 Package: CSLSevap
 Type: Package
 Title: Evapo(transpi)ration Calculations
-Version: 1.0.2
+Version: 1.1.0
 Author: Carolyn Voter <cvoter@wisc.edu>
 Maintainer: Carolyn Voter <cvoter@wisc.edu>
-Description: Multiple ways of calculating evapo(transpi)ration.
-    Includes FAO Penman-Monteith RET, McJannet lake evaporation, and unmodified 
-    Hamond lake evaporation. See help for the "evaporation" function for 
-    required inputs for each method.
+Description: The package 'CSLSevap' bundles multiple ways of calculating 
+    evapo(transpi)ration for use in the Wisconsin Department of Natural 
+    Resources Central Sands Lakes Study. Methods include: 1) FAO Penman-Monteith 
+    reference evapotranspiration, 2) McJannet lake evaporation, and 3) 
+    Unmodified Hamond lake evaporation. For most uses, it is only necessary to 
+    interact with the 'evaporation' or 'CSLS_daily_met' functions. However, all 
+    functions are made accessible to the user since they may be useful in other 
+    contexts (e.g., for calculating saturation vapor pressure, dew point 
+    temperature).
 Imports:
-  CSLSdata,
-  lubridate,
-	rlang,
-	NISTunits,
-	magrittr,
-	dplyr,
-	zoo
+  CSLSdata, dplyr, lubridate, magrittr, NISTunits, rlang, zoo
 Suggests:
-    knitr,
-    devtools,
-    roxygen2,
-    testthat,
-    rmarkdown,
-    ggplot2,
-    reshape2
+    devtools, ggplot2, knitr, reshape2, rmarkdown, roxygen2, testthat
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.0.2
+Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr

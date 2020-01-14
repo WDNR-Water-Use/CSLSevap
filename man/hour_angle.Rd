@@ -7,7 +7,7 @@
 hour_angle(tmid, tL, Lm, Lz)
 }
 \arguments{
-\item{tmid}{date and time of the midpoint of the time period [POSIXct].}
+\item{tmid}{date and time of the midpoint of the time period \link{POSIXct}.}
 
 \item{tL}{length of the time period, from lubridate function "interval_len".}
 
@@ -30,6 +30,6 @@ given location and day of the year using Equations 29-33 from Allen et al.
 }
 \references{
 Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
-  evapotranspiration: Guidelines for computing crop water requirements. Rome:
-  FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
+evapotranspiration: Guidelines for computing crop water requirements. Rome:
+FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
 }

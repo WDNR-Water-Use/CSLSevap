@@ -27,7 +27,7 @@ MJ/m^2/day.}
 }
 \value{
 \item{Rnl}{Net outgoing longwave radiation (MJ/m^2/hour or
-                   MJ/m^2/day, depending on dt)}
+MJ/m^2/day, depending on dt)}
 }
 \description{
 Calculates the net outgoing longwave radiation for a given location based on
@@ -36,6 +36,6 @@ records. Based on Equation 39 and p.74-75 in Allen et al. (1998).
 }
 \references{
 Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
-  evapotranspiration: Guidelines for computing crop water requirements. Rome:
-  FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
+evapotranspiration: Guidelines for computing crop water requirements. Rome:
+FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
 }

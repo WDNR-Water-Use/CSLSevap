@@ -2,10 +2,11 @@
 #'
 #' This function calculates daily evaporation for a CSLS lake given the desired
 #' method and lake name. While this function can use any of the methods
-#' availaible in CSLSevap::evaporation, it is currently hardwired to load input
-#' data from the CSLS field campaign (as available in CSLSdata) and analysis is
-#' restricted to dates with available weather, lake surface temperature, and
-#' lake level data regardless of the requirements of the chosen method.
+#' availaible in \code{\link{evaporation}}, it is currently hardwired to load
+#' input data from the CSLS field campaign (as available in \pkg{CSLSdata}) and
+#' analysis is restricted to dates with available weather, lake surface
+#' temperature, and lake level data (via \code{\link{CSLS_find_common_dates}})
+#' regardless of the requirements of the chosen method.
 #'
 #' @param method denotes which evaporation method to use ("FAO", "McJannet", or
 #'               "Hamon").
@@ -21,16 +22,22 @@
 #' @param no_condensation defaults to FALSE. If TRUE, forces negative
 #'                        evapotranspiration values (i.e., condensation) to zero
 #'
-#' @return weather, a data frame with daily weather information including:
-#' \describe{
-#' \item{date}{day of each weather observation}
+#' @return **weather**, a data frame with daily weather information including:
+#' \item{date}{day of each weather observation [POSIXct]}
 #' \item{atmp_min}{minimum air temperature for the day (deg C)}
 #' \item{atmp_max}{maximum air temperature for the day (deg C)}
 #' \item{RH_min}{minimum relative humidity for the day (percent)}
 #' \item{RH_max}{maximum relative humidity for the day (percent)}
 #' \item{P}{total precipitation for the day (mm)}
 #' \item{E}{total lake evaporation for the day (mm)}
-#' }
+#'
+#' @examples
+#' # Note that "lakename" is not really used for "Hamon" method
+#' # However, this function is currently hardwired to require it.
+#' lake      <- "Pleasant"
+#' daily_met <- CSLS_daily_met("McJannet", lakename = lake)
+#' daily_met <- CSLS_daily_met("McJannet", use_lst = FALSE, lakename = lake)
+#' daily_met <- CSLS_daily_met("Hamon", lakename = lake)
 #'
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data

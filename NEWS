@@ -1,2 +1,5 @@
+# CSLSevap 1.1
+Added Unmodified Hamon method and updated documentation (including adding examples and a vignette).
+
 # CSLSevap 1.0
 Released initial version of CSLSevap with complete FAO Penman-Monteith and McJannet lake evaporation capabilities.

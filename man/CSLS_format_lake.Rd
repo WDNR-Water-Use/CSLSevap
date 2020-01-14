@@ -25,14 +25,14 @@ for a single lake.}
 temperature data.}
 }
 \value{
-lake, a list with the following lake-specific parameters:
+\strong{lake}, a list with the following lake-specific parameters:
 \item{A}{surface area of the lake (km^2)}
 \item{depth_m}{depth of the lake (m). Can be a static value or vector
-              corresponding with datetimes vector.}
+corresponding with datetimes vector.}
 \item{lst}{optional data frame with date (datetime) and ltmp (lake
-           temperature, degC).}
+temperature, degC).}
 \item{wtmp0}{required initial water temperature for first day in datetimes
-             (degC)}
+(degC)}
 }
 \description{
 Extracts location information for the lake from the site dictionary and

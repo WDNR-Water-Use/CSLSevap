@@ -9,7 +9,7 @@
 #'           ranges from 0 to 360 degrees). Defaults to 90 for Central Time
 #'           Zone, USA.
 #'
-#' @return loc, a list with the following location-specific parameters:
+#' @return **loc*, a list with the following location-specific parameters:
 #' \item{z}{elevation above mean sea level (m)}
 #' \item{phi}{latitude of location (radians). Positive for northern
 #'            hemisphere, negative for southern hemisphere}

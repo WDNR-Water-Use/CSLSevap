@@ -106,7 +106,7 @@ u_fcn <- function(u10, A) {
 #'   http://www.clw.csiro.au/publications/waterforahealthycountry/mdbsy/technical/U-OpenWaterEvaporation.pdf.
 #'
 #' @param uz wind speed at wind_z height (m/s)
-#' @param wind_z height at which uz is measured (m)
+#' @param wind_z height at which \code{uz} is measured (m)
 #' @param z0 aerodynamic roughness of land cover at measurement site (m)
 #' @param A surface area of the lake (km^2)
 #' @param lake_z elevation of lake above mean sea level (m)

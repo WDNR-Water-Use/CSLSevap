@@ -29,7 +29,7 @@ value of lambda.}
 }
 \value{
 \item{gamma}{the psychrometric constant for the given elevation
-                     (kPa/degrees C)}
+(kPa/degrees C)}
 }
 \description{
 Calculates the psychrometric constant for a given elevation based on Equation
@@ -37,6 +37,6 @@ Calculates the psychrometric constant for a given elevation based on Equation
 }
 \references{
 Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop
-  evapotranspiration: Guidelines for computing crop water requirements. Rome:
-  FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
+evapotranspiration: Guidelines for computing crop water requirements. Rome:
+FAO. Retrieved from http://www.fao.org/docrep/X0490E/x0490e00.htm.
 }
