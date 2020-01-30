@@ -20,6 +20,13 @@ To install from within the WI DNR (assumes you're using R Studio and are familia
 	install.packages("devtools")
 	devtools::install()
 	```
+Potential issues you may run into:
+
+  * You are asked if you would like to update packages, you say "yes" (to some or all) and then it throws a weird error (e.g., "package 'CSLSevap' is not available (for R version 3.6.1)")
+	  * Restart R, and try again not updating any packages
+      * Restart R, and try updating packages independently of devtools (e.g., in the "Packages" tab of RStudio, click the green icon to "Update", "Select All", and "Install Updates"
+	  * Restart R between troubleshooting attempts and whenever you run into errors - may take a few restarts, or a few attempts at updating packages.
+	
 ## Package Organization
 
 This package is organized based on [R package conventions](http://r-pkgs.had.co.nz/) and includes the following components:
