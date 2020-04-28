@@ -7,7 +7,6 @@
 CSLS_daily_met(
   method = "McJannet",
   use_lst = TRUE,
-  lakename,
   Lz = 90,
   wind_elev = 3,
   z0 = 0.02,
@@ -20,8 +19,6 @@ CSLS_daily_met(
 
 \item{use_lst}{logical defaults to TRUE to use available lake surface
 temperature data.}
-
-\item{lakename}{name of lake currently evaluating}
 
 \item{Lz}{longitude of location's measurement timezone (degrees west of
 Greenwich). For example, Lz = 75, 90, 105 and 120° for measurement
@@ -55,11 +52,8 @@ temperature, and lake level data (via \code{\link{CSLS_find_common_dates}})
 regardless of the requirements of the chosen method.
 }
 \examples{
-# Note that "lakename" is not really used for "Hamon" method
-# However, this function is currently hardwired to require it.
-lake      <- "Pleasant"
-daily_met <- CSLS_daily_met("McJannet", lakename = lake)
-daily_met <- CSLS_daily_met("McJannet", use_lst = FALSE, lakename = lake)
-daily_met <- CSLS_daily_met("Hamon", lakename = lake)
+daily_met <- CSLS_daily_met("McJannet")
+daily_met <- CSLS_daily_met("McJannet", use_lst = FALSE)
+daily_met <- CSLS_daily_met("Hamon")
 
 }
