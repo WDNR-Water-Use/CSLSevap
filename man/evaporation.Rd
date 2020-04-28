@@ -83,7 +83,8 @@ values (i.e., condensation) to zero}
 \item{ca}{specific heat of the air (MJ/kg/K), defaults to 0.001013 MJ/kg/K}
 }
 \value{
-\item{evap}{Evapo(transpi)ration (mm/hour or mm/day) \link{vector}}
+\item{evap}{a vector with evapo(transpi)ration (mm/hour or mm/day)
+for each timestep in \code{weather$datetimes}}
 }
 \description{
 Calculates evaporation (mm/day given daily or monthly inputs, or mm/hour
@@ -106,13 +107,6 @@ following guidelines:\tabular{llll}{
    weather \tab all but \emph{z0} \tab all \tab only \emph{datetimes} & \emph{atmp} \cr
    lake \tab none, use NULL \tab all but \emph{lst} \tab none, use NULL \cr
 }
-}
-\examples{
-# Creating inputs
-lakename   <- "Pleasant"
-dictionary <- CSLSdata::dictionary[[lakename]]
-loc        <- CSLS_format_loc(dictionary, Lz)
-
 }
 \references{
 Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop

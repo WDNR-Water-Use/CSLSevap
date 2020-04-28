@@ -46,16 +46,26 @@
 CSLS_find_common_dates <- function(weather, lake_levels, lst) {
 
   # Determine first day lst, weather, and lake level data
-  lst_day0            <- floor_date(min(lst$date), unit = "day")
-  weather_day0        <- floor_date(min(weather$date), unit = "day")
-  lake_levels_day0    <- floor_date(min(lake_levels$date), unit = "day")
-  day0                <- max(c(lst_day0, weather_day0, lake_levels_day0))
+  days_01 <- lst %>%
+             group_by(.data$lake) %>%
+             summarise(day0 = floor_date(min(.data$date), unit = "day"))
+  days_02 <- weather %>%
+             summarise(day0 = floor_date(min(.data$date), unit = "day"))
+  days_03 <- lake_levels %>%
+             group_by(.data$lake) %>%
+             summarise(day0 = floor_date(min(.data$date), unit = "day"))
+  day0    <- max(c(days_01$day0, days_02$day0, days_03$day0))
 
   # Determine last day lst, weather, and lake level data
-  lst_day_end         <- floor_date(max(lst$date), unit = "day")
-  weather_day_end     <- floor_date(max(weather$date), unit = "day")
-  lake_levels_day_end <- floor_date(max(lake_levels$date), unit = "day")
-  day_end             <- min(c(lst_day_end, weather_day_end, lake_levels_day_end))
+  days_01 <- lst %>%
+             group_by(.data$lake) %>%
+             summarise(day0 = floor_date(max(.data$date), unit = "day"))
+  days_02 <- weather %>%
+             summarise(day0 = floor_date(max(.data$date), unit = "day"))
+  days_03 <- lake_levels %>%
+             group_by(.data$lake) %>%
+             summarise(day0 = floor_date(max(.data$date), unit = "day"))
+  day_end <- min(c(days_01$day0, days_02$day0, days_03$day0))
 
   # Determine intervals of overlap
   date_interval1 <- interval(day0, day_end) # inclusive of day0
@@ -75,28 +85,12 @@ CSLS_find_common_dates <- function(weather, lake_levels, lst) {
   date_vec$date <- as_datetime(date_vec$date)
 
   # Subset data to date intervals
-  lst         <- lst[lst$date %within% date_interval1,]
-  daily_lst   <- lst %>%
-                 group_by(date = floor_date(.data$date, unit = "day")) %>%
-                 summarise(ltmp = mean(.data$ltmp, na.rm = TRUE)) %>%
-                 ungroup()
-  wtmp0       <- daily_lst$ltmp[daily_lst$date == day0]
+  daily_lst   <- lst[lst$date %within% date_interval1,]
+  wtmp0       <- daily_lst[daily_lst$date == day0,]
   lst         <- daily_lst[daily_lst$date %within% date_interval2,]
 
   weather     <- weather[weather$date %within% date_interval2,]
   lake_levels <- lake_levels[lake_levels$date %within% date_interval2,]
-
-  # Ensure all have all dates for lake levels
-  lake_levels       <- merge(lake_levels, date_vec, all.y = TRUE)
-  lake_levels       <- lake_levels %>%
-                       arrange(.data$date) %>%
-                       select(.data$date,
-                              .data$level_m,
-                              .data$area_m2,
-                              .data$vol_m3)
-  zoo.levels        <- read.zoo(lake_levels)
-  zoo.levels        <- as.data.frame(na.approx(zoo.levels))
-  lake_levels[,2:4] <- zoo.levels
 
   return(list(weather = weather,
               lst = lst,
