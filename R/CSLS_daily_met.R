@@ -66,7 +66,7 @@ CSLS_daily_met <- function(method = "McJannet",
                    ungroup() %>%
                    select(.data$lake, .data$date, .data$ltmp)
   lake_levels   <- CSLSdata::lake_levels
-  elev_area_vol <- CSLSdata::elev_area_vol
+  elev_area_vol <- CSLSdata::bathymetry
   dictionary    <- CSLSdata::dictionary
 
   # Subset to common interval
